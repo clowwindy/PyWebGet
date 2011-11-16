@@ -66,12 +66,12 @@ class TaskInfo(object):
                 f.close()
 
                 if self.oncomplete:
-                    self.oncomplete(self)
+                    self.oncomplete(self.task)
         except Exception:
             import traceback
             traceback.print_exc()
             if self.onerror:
-                self.onerror(self)
+                self.onerror(self.task)
 
     def _progress(self, download_t, download_d, upload_t, upload_d):
         print "Total to download", download_t
