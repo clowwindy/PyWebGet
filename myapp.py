@@ -24,9 +24,9 @@ def my_run():
         db.insert('users', username="user %d" % a["num"])
         my_lock.release()
 
-threading.Thread(target=my_run).start()
-threading.Thread(target=my_run).start()
-threading.Thread(target=my_run).start()
+#threading.Thread(target=my_run).start()
+#threading.Thread(target=my_run).start()
+#threading.Thread(target=my_run).start()
 
 
 class index:

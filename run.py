@@ -1,7 +1,7 @@
 __author__ = 'clowwindy'
 
 
-import web
+import threading
 from core.controller import Controller
 
 
@@ -14,4 +14,9 @@ from core.controller import Controller
 
 controller = Controller()
 controller.init()
-controller.run()
+controller_thread = threading.Thread(target=controller.run)
+controller_thread.start()
+
+import webui.app
+
+webui.app.run()

@@ -2,10 +2,60 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>my app</title>
-    <script src="test.js"></script>
+    <title>PyWebGet</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <style type="text/css" title="currentStyle">
+			@import "css/demo_page.css";
+			@import "css/demo_table_jui.css";
+			@import "css/smoothness/jquery-ui-1.8.4.custom.css";
+    </style>
+    <script src="js/jquery.js" type="text/javascript"></script>
+    <script src="js/jquery.dataTables.js" type="text/javascript"></script>
+		<script type="text/javascript" charset="utf-8">
+            jQuery.fn.dataTableExt.aTypes.push(
+                function ( sData ) {
+                    return 'html';
+                }
+            );
+			$(document).ready(function() {
+				var oTable = $('#example').dataTable( {
+					"bProcessing": true,
+					"sAjaxSource": "test.js",
+                    "sScrollY": 250,
+                    "bJQueryUI": true,
+                    "sPaginationType": "full_numbers",
+					"aoColumns": [
+						{ "mDataProp": "checkbox" },
+						{ "mDataProp": "status" },
+						{ "mDataProp": "filename" },
+						{ "mDataProp": "dir" },
+						{ "mDataProp": "percent" },
+						{ "mDataProp": "date_created" },
+						{ "mDataProp": "date_completed" }
+					]
+				} );
+			} );
+		</script>
 </head>
 <body>
+<div id="dt_example">
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+	<thead>
+		<tr>
+			<th width="25"></th>
+			<th width="50">Status</th>
+			<th>Filename</th>
+			<th width="15%">Path</th>
+			<th width="5%">Percent</th>
+			<th width="10%">Created</th>
+			<th width="10%">Completed</th>
+		</tr>
+	</thead>
+	<tbody>
 
+
+	</tbody>
+</table>
+</div>
 </body>
 </html>
