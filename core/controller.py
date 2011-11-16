@@ -2,18 +2,19 @@
 
 __author__ = 'clowwindy'
 
-import web, taskinfo, threading
+import web, task, threading
+from utils import log
 DB_NAME = 'db.sqlite3.db'
 DB_TYPE = 'sqlite'
 
 CHECK_INTERVAL = 30
 
 STATUS_RUNNING = 1
-STATUS_QUITTING = 2
+STATUS_STOPPING = 2
 
 class Controller(object):
     threads = []
-    taskinfos = []
+    tasks = []
     thread_limit = 2
     lock = threading.Lock()
     update_event = threading.Event()
@@ -21,69 +22,98 @@ class Controller(object):
 
     def init(self):
         #第一次启动时运行，将所有downloading修改为inqueue
-        db = web.database(dbn=DB_TYPE, db=DB_NAME)
-        db.update('Task', where="status = %d" % taskinfo.STATUS_DOWNLOADING, status = "%d" % taskinfo.STATUS_INQUEUE)
+        db = self._db()
+        db.update('Task', where="status = %d" % task.STATUS_DOWNLOADING, status = "%d" % task.STATUS_INQUEUE)
 
     def update_tasks(self):
         
         #获取所有任务
-        db = web.database(dbn=DB_TYPE, db=DB_NAME)
+        db = self._db()
         tasks = db.select('Task')
         task_running = len(self.threads)
 
-        for task in tasks:
-            if task.status == taskinfo.STATUS_INQUEUE:
+        for a_task in tasks:
+            if a_task.status == task.STATUS_INQUEUE:
                 if task_running >= self.thread_limit:
+                    log("over limit")
                     break
-                self._update_task_status(task,taskinfo.STATUS_DOWNLOADING)
-                t = threading.Thread(target=self.run_task,args=(task,))
+                a_task.status = task.STATUS_DOWNLOADING
+                self._update_task_status(db, task.STATUS_DOWNLOADING, a_task)
+                t = threading.Thread(target=self.run_task,args=(a_task,))
                 self.lock.acquire()
                 self.threads.append(t)
                 self.lock.release()
                 t.start()
                 task_running += 1
 
-    def run_task(self, task):
+    def run_task(self, a_task):
         thread = threading.currentThread()
-        self.threads.append(thread)
         try:
-            ti = taskinfo.TaskInfo(task)
+            ti = task.Task(a_task)
+            self.tasks.append(a_task)
             ti.oncomplete = self._oncomplete
             ti.onerror = self._onerror
             ti.download()
         finally:
             self.lock.acquire()
+            self.tasks.remove(a_task)
             self.threads.remove(thread)
             self.lock.release()
 
     def run(self):
+        self.status = STATUS_RUNNING
         while self.status == STATUS_RUNNING:
             self.update_tasks()
             self.update_event.clear()
             self.update_event.wait(CHECK_INTERVAL)
 
     def stop(self):
-        pass
-    def add_task(self):
-        pass
-    def pause_task(self):
-        pass
+        self.status = STATUS_STOPPING
+        self.update_event.set()
+        
+    def add_task(self, url, cookie="", referrer = ""):
+        db = self._db()
+        db.insert('Task', url=url, cookie=cookie, referrer=referrer)
+        self.update_event.set()
+
+    def pause_task(self, a_task=None, task_id=None):
+        if a_task is None and task_id is None:
+            raise Exception("task or task_id must be set!")
+        if task_id is None:
+            task_id = a_task.id
+        db = self._db()
+        self._update_task_status(db, task.STATUS_PAUSED, task_id=task_id)
+        for a_task_1 in self.tasks:
+            if task_id == a_task_1.id:
+                a_task_1.status = task.STATUS_PAUSED
+                
+    
     def remove_task(self):
         pass
+    
     def task_list(self):
-        db = web.database(dbn='sqlite', db=DB_NAME)
+        db = self._db()
         tasks = db.select('Task')
         return tasks
         #TODO: 转换成json
+    
+    def _db(self):
+        return web.database(dbn='sqlite', db=DB_NAME)
 
-    def _update_task_status(self,task,status):
-        db = web.database(dbn=DB_TYPE, db=DB_NAME)
-        db.update('Task', where="id = %d" % task.id, status = "%d" % status)
+    def _update_task_status(self, db, status, a_task=None, task_id=None):
+        if a_task is None and task_id is None:
+            raise Exception("task or task_id must be set!")
+        if task_id is None:
+            task_id = a_task.id
+        db.update('Task', where="id = %d" % task_id, status = "%d" % status)
 
-    def _onerror(self, task):
+    def _onerror(self, a_task):
         pass
-    def _oncomplete(self, task):
-        self._update_task_status(task,taskinfo.STATUS_COMPLETED)
-        print "complete: "+task.url
+    def _oncomplete(self, a_task):
+        db = self._db()
+        self._update_task_status(db, task.STATUS_COMPLETED, a_task)
+        import time
+        db.update('Task', where="id = %d" % a_task.id, date_complete = "%d" % time.time())
+        log("complete: "+a_task.url)
         self.update_event.set()
         
