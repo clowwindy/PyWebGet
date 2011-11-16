@@ -70,6 +70,8 @@ class Task(object):
 
                 if self.task.status == STATUS_DOWNLOADING and self.oncomplete:
                     self.oncomplete(self)
+            else:
+                self.oncomplete(self)
         except Exception:
             import traceback
             traceback.print_exc()

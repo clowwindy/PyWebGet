@@ -18,5 +18,6 @@ controller_thread = threading.Thread(target=controller.run)
 controller_thread.start()
 
 import webui.app
+webui.app.set_controller(controller)
 
 webui.app.run()

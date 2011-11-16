@@ -9,6 +9,7 @@
 			@import "css/demo_table_jui.css";
 			@import "css/smoothness/jquery-ui-1.8.4.custom.css";
     </style>
+    <link rel="stylesheet" type="text/css" href="css/pywebget.css" />
     <script src="js/jquery.js" type="text/javascript"></script>
     <script src="js/jquery.dataTables.js" type="text/javascript"></script>
 		<script type="text/javascript" charset="utf-8">
@@ -20,7 +21,7 @@
 			$(document).ready(function() {
 				var oTable = $('#example').dataTable( {
 					"bProcessing": true,
-					"sAjaxSource": "test.js",
+					"sAjaxSource": "/task_list",
                     "sScrollY": 250,
                     "bJQueryUI": true,
                     "sPaginationType": "full_numbers",
