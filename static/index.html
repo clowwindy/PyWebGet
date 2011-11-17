@@ -22,9 +22,11 @@
 				var oTable = $('#example').dataTable( {
 					"bProcessing": true,
 					"sAjaxSource": "/task_list",
-                    "sScrollY": 250,
+                    "sScrollX": 1440,
                     "bJQueryUI": true,
                     "sPaginationType": "full_numbers",
+                    "bAutoWidth": false,
+                    "bStateSave": true,
 					"aoColumns": [
 						{ "mDataProp": "checkbox" },
 						{ "mDataProp": "status" },
@@ -46,10 +48,10 @@
 			<th width="25"></th>
 			<th width="50">Status</th>
 			<th>Filename</th>
-			<th width="15%">Path</th>
-			<th width="5%">Percent</th>
-			<th width="10%">Created</th>
-			<th width="10%">Completed</th>
+			<th width="100">Path</th>
+			<th width="30">Percent</th>
+			<th width="165">Created</th>
+			<th width="165">Completed</th>
 		</tr>
 	</thead>
 	<tbody>

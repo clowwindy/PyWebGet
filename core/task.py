@@ -5,10 +5,20 @@ __author__ = 'clowwindy'
 BUF_SIZE = 32768
 CHUNK_SIZE = 4096
 
-STATUS_INQUEUE = 0
+STATUS_QUEUED = 0
 STATUS_DOWNLOADING = 1
 STATUS_PAUSED = 2
 STATUS_COMPLETED = 3
+
+def str_by_status(status):
+    if status == STATUS_QUEUED:
+        return "Queued"
+    elif status == STATUS_DOWNLOADING:
+        return "Downloading"
+    elif status == STATUS_PAUSED:
+        return "Paused"
+    elif status == STATUS_COMPLETED:
+        return "Completed"
 
 class Task(object):
     task_id = -1
@@ -54,6 +64,7 @@ class Task(object):
                     self.completed_size += cur_length
                     f = open(filename,'ab',BUF_SIZE)
                 else:
+                    #处理301等情况
                     raise
                 data = netfile.read(CHUNK_SIZE)
                 
@@ -70,6 +81,8 @@ class Task(object):
 
                 if self.task.status == STATUS_DOWNLOADING and self.oncomplete:
                     self.oncomplete(self)
+                elif self.onerror:
+                    self.onerror(self)
             else:
                 self.oncomplete(self)
         except Exception:
