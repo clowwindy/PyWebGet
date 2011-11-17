@@ -22,8 +22,13 @@ body {
     padding-right: 10px;
 }
 #add_task .text{
-    width:300px;
+    width:100%;
 }
 #add_task textarea {
     height: 100px;
+    padding: 0;
+}
+.ui-dialog {
+    border-radius: 7px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.7);
 }

@@ -26,15 +26,14 @@ function str_by_status(status) {
 }
 
 function load_data() {
-    var oTable = $('#download_list_table').dataTable({
+    window.oTable = $('#download_list_table').dataTable({
 //        "bProcessing": true,
         "bDestroying": true,
         "sAjaxSource": "/task_list",
-        "sScrollX": 1440,
         "sScrollY": 400,
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
-        "bAutoWidth": false,
+        "bAutoWidth": true,
         "bStateSave": true,
         "aLengthMenu": [
             [25, 50, 100, -1],
@@ -96,14 +95,21 @@ $(function() {
         $("#add_task").dialog({
             title: _s["Add Task"],
             modal:true,
-            minHeight:200,
+            minHeight:286,
             minWidth:390,
             buttons: { "Ok": function() {
-                $(this).dialog("close");
-            },
+                    add_task();
+                    $(this).dialog("close");
+                },
                 "Cancel": function() {
                     $(this).dialog("close");
-                } }
+                }
+            }
+        });
+        $( "#add_task" ).dialog({
+           resize: function(event, ui) {
+                //TODO: resize textarea
+           }
         });
     });
 });
@@ -117,6 +123,7 @@ function set_table_size() {
     $(".dataTables_scrollBody").css("height",
         table_body_height + "px"
     );
+    oTable.fnAdjustColumnSizing();
 }
 
 $(window).resize(function() {

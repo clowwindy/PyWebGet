@@ -48,15 +48,17 @@ class Controller(object):
 
     def run_task(self, a_task):
         thread = threading.currentThread()
+        ti = None
         try:
             ti = task.Task(a_task)
-            self.tasks.append(a_task)
+            self.tasks.append(ti)
             ti.oncomplete = self._oncomplete
             ti.onerror = self._onerror
             ti.download()
         finally:
             self.lock.acquire()
-            self.tasks.remove(a_task)
+            if ti:
+                self.tasks.remove(ti)
             self.threads.remove(thread)
             self.lock.release()
 
@@ -106,6 +108,7 @@ class Controller(object):
                     if a_task.id == a_task_2.id:
                         a_task.completed_size = a_task_2.completed_size
                         a_task.speed = a_task_2.speed
+                        a_task.filename = a_task_2.filename
                         found = True
                         break
             if not found:
