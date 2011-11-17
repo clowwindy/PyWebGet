@@ -1,11 +1,16 @@
 __author__ = 'clowwindy'
 import web
-from core import task
+from core import task, version
 import time
 import utils
 
+
+def common_setup():
+    web.header('Server', "%s/%s" % (version.APP_NAME, version.VERSION))
+
 class index:
     def GET(self):
+        common_setup()
         return web.seeother("/static/")
 
 class task_list:
@@ -20,6 +25,8 @@ class task_list:
 #            a_task.date_completed = utils.timestamp_repr(a_task.date_completed)
 #            a_task.date_created = utils.timestamp_repr(a_task.date_created)
         import json
+        web.header('Content-Type', 'application/x-javascript')
+        common_setup()
         return json.dumps({"aaData":tasks})
 
 controller = None

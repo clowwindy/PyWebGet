@@ -48,7 +48,6 @@ $(document).ready(function() {
         "aoColumnDefs": [
             {
                 "fnRender": function ( oObj ) {
-                    console.log(oObj.aData);
                     return timestamp_repr(oObj.aData["date_created"]);
                 },
                 "aTargets": [ -2 ]
