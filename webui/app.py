@@ -13,13 +13,12 @@ class task_list:
         global controller
         tasks = controller.task_list()
         for a_task in tasks:
-            a_task.status = task.str_by_status(a_task.status)
-            a_task.checkbox = "<input type='checkbox' id='%d' />" % a_task.id
+#            a_task.status = task.str_by_status(a_task.status)
+#            a_task.checkbox = "<input type='checkbox' id='task_%d' />" % a_task.id
             a_task.percent = "100%"
             a_task.percent = "100%"
-            a_task.date_completed = utils.timestamp_repr(a_task.date_completed)
-            a_task.date_created = utils.timestamp_repr(a_task.date_created)
-
+#            a_task.date_completed = utils.timestamp_repr(a_task.date_completed)
+#            a_task.date_created = utils.timestamp_repr(a_task.date_created)
         import json
         return json.dumps({"aaData":tasks})
 

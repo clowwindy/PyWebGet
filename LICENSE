@@ -1,0 +1,27 @@
+PyWebGet
+Created by Clowwindy
+PyWebGet is dual licensed under the GPL v2 license or a BSD (3-point) license.
+
+This software is built with these software:
+
+DataTable
+http://www.datatables.net/
+DataTables is dual licensed under the GPL v2 license or a BSD (3-point) license.
+
+Datejs
+http://www.datejs.com/
+MIT License
+
+jQuery
+http://jquery.com/
+MIT License
+GPL
+
+jQuery UI
+http://jqueryui.com/
+Dual licensed under the MIT or GPL Version 2 licenses.
+
+Webpy
+http://webpy.org/
+web.py is a web framework for Python that is as simple as it is powerful. web.py is in the public domain; you can use it for whatever purpose with absolutely no restrictions.
+
