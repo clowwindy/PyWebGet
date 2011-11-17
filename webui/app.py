@@ -1,9 +1,11 @@
+# _*_ coding:utf-8 -*-
+
 __author__ = 'clowwindy'
 import web
 from core import task, version
 import time
 import utils
-
+import json
 
 def common_setup():
     web.header('Server', "%s/%s" % (version.APP_NAME, version.VERSION))
@@ -12,6 +14,18 @@ class index:
     def GET(self):
         common_setup()
         return web.seeother("/static/")
+    
+class add_task:
+    def POST(self):
+        global controller
+        common_setup()
+        try:
+            data = json.loads(web.input()['data'])
+            #TODO: 支持多个URL
+            controller.add_task(data['urls'], data['cookie'], data['referrer'])
+            return "'OK'"
+        except Exception, e:
+            return json.dumps(unicode(e))
 
 class task_list:
     def GET(self):
@@ -39,6 +53,7 @@ def run():
     urls = (
       '/', 'index',
       '/task_list', 'task_list',
+      '/add_task', 'add_task',
     )
 
     my_app = web.application(urls, globals(),autoreload=False)

@@ -45,12 +45,16 @@ class Task(object):
             import os, sys, urllib2
             cur_length = 0
             url = self.task.url
+
+            # Update filename from URL
+            if self.task.filename is None:
+                self.task.filename = self._get_filename_by_url(self.task.url)
+                
             filename = self.download_path + "/" +self.task.filename
             if os.path.exists(filename):
                 cur_length = os.path.getsize(filename)
 
             range = "bytes=%d-"%(cur_length,)
-#            print range
 
             request = urllib2.Request(url)
             request.add_header("Range", range)
@@ -64,12 +68,13 @@ class Task(object):
                     self.completed_size += cur_length
                     f = open(filename,'ab',BUF_SIZE)
                 else:
-                    #处理301等情况
+                    #TODO 处理301等情况
                     raise
                 data = netfile.read(CHUNK_SIZE)
                 
                 self.completed_size = cur_length
-                
+
+                # Download
                 while data and self.task.status == STATUS_DOWNLOADING:
                     self.completed_size += len(data)
                     f.write(data)
@@ -90,3 +95,15 @@ class Task(object):
             traceback.print_exc()
             if self.onerror:
                 self.onerror(self)
+
+    def _get_filename_by_url(self, url):
+        try:
+            import re
+            result = re.match(r"[^:]+://[^/]+/?([^?#]*)",url).groups()[0]
+            result = result.split('/')[-1]
+            if result:
+                return result
+            else:
+                return "download"
+        except Exception:
+            return "download"

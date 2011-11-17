@@ -24,7 +24,7 @@ class Controller(object):
         #第一次启动时运行，将所有downloading修改为inqueue
         db = self._db()
         db.update('Task', where="status = %d" % task.STATUS_DOWNLOADING, status = "%d" % task.STATUS_QUEUED)
-
+ 
     def update_tasks(self):
         
         #获取所有任务
@@ -72,9 +72,13 @@ class Controller(object):
         self.update_event.set()
         
     def add_task(self, url, cookie="", referrer = ""):
-        db = self._db()
-        db.insert('Task', url=url, cookie=cookie, referrer=referrer)
-        self.update_event.set()
+        import re
+        if re.match(r"[^:]+://[^/]+/?([^?#]*)",url):
+            db = self._db()
+            db.insert('Task', url=url, cookie=cookie, referrer=referrer)
+            self.update_event.set()
+        else:
+            raise AssertionError("URL is not valid: " + url)
 
     def pause_task(self, a_task=None, task_id=None):
         if a_task is None and task_id is None:
@@ -126,7 +130,7 @@ class Controller(object):
         self._update_task_status(db, task.STATUS_COMPLETED, a_task)
         import time
         #TODO将下载进度等状态保存到数据库
-        db.update('Task', where="id = %d" % a_task.id, date_complete = "%d" % time.time())
+        db.update('Task', where="id = %d" % a_task.id, date_completed = "%d" % time.time(), filename=a_task.filename)
         log("complete: "+a_task.url)
         self.update_event.set()
         

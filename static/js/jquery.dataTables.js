@@ -4609,7 +4609,10 @@
 			}
 			else if ( sType == "html" )
 			{
-				return sData.replace(/\n/g," ").replace( /<.*?>/g, "" );
+                if(sData)
+				    return sData.replace(/\n/g," ").replace( /<.*?>/g, "" );
+                else
+                    return '';
 			}
 			else if ( typeof sData == "string" )
 			{

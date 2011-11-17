@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    padding: 0;
+	font: 80%/1.45em "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+    overflow: hidden;
+}
+#toolbar {
+    padding: 10px;
+}
+.toolbar_icon {
+    height: 26px;
+    width: 26px;
+    vertical-align: middle;
+}
+.text,#download_list_table_filter input {
+    border: 1px solid #aaaaaa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) inset;
+}
+#download_list_table_filter input {
+    border-radius: 10px 10px 10px 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+#add_task .text{
+    width:300px;
+}
+#add_task textarea {
+    height: 100px;
+}

@@ -2,8 +2,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * General page setup
  */
-#dt_example {
-	font: 80%/1.45em "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+#download_list_wrapper {
 	margin: 0;
 	padding: 0;
 	color: #333;
@@ -11,49 +10,49 @@
 }
 
 
-#dt_example #container {
+#download_list_wrapper #container {
 	width: 800px;
 	margin: 30px auto;
 	padding: 0;
 }
 
 
-#dt_example #footer {
+#download_list_wrapper #footer {
 	margin: 50px auto 0 auto;
 	padding: 0;
 }
 
-#dt_example #demo {
+#download_list_wrapper #demo {
 	margin: 30px auto 0 auto;
 }
 
-#dt_example .demo_jui {
+#download_list_wrapper .demo_jui {
 	margin: 30px auto 0 auto;
 }
 
-#dt_example .big {
+#download_list_wrapper .big {
 	font-size: 1.3em;
 	font-weight: bold;
 	line-height: 1.6em;
 	color: #4E6CA3;
 }
 
-#dt_example .spacer {
+#download_list_wrapper .spacer {
 	height: 20px;
 	clear: both;
 }
 
-#dt_example .clear {
+#download_list_wrapper .clear {
 	clear: both;
 }
 
-#dt_example pre {
+#download_list_wrapper pre {
 	padding: 15px;
 	background-color: #F5F5F5;
 	border: 1px solid #CCCCCC;
 }
 
-#dt_example h1 {
+#download_list_wrapper h1 {
 	margin-top: 2em;
 	font-size: 1.3em;
 	font-weight: normal;
@@ -63,7 +62,7 @@
 	clear: both;
 }
 
-#dt_example h2 {
+#download_list_wrapper h2 {
 	font-size: 1.2em;
 	font-weight: normal;
 	line-height: 1.6em;
@@ -71,16 +70,16 @@
 	clear: both;
 }
 
-#dt_example a {
+#download_list_wrapper a {
 	color: #0063DC;
 	text-decoration: none;
 }
 
-#dt_example a:hover {
+#download_list_wrapper a:hover {
 	text-decoration: underline;
 }
 
-#dt_example ul {
+#download_list_wrapper ul {
 	color: #4E6CA3;
 }
 

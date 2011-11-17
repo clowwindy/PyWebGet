@@ -4,11 +4,11 @@
     <title>PyWebGet</title>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
     <style type="text/css" title="currentStyle">
-			@import "css/demo_page.css";
-			@import "css/demo_table_jui.css";
-			@import "css/smoothness/jquery-ui-1.8.4.custom.css";
+        @import "css/page.css";
+        @import "css/table_jui.css";
+        @import "css/smoothness/jquery-ui-1.8.4.custom.css";
     </style>
-    <link rel="stylesheet" type="text/css" href="css/pywebget.css" />
+    <link rel="stylesheet" type="text/css" href="css/pywebget.css"/>
     <script src="js/jquery.js" type="text/javascript"></script>
     <script src="js/jquery-ui.custom.min.js" type="text/javascript"></script>
     <script src="js/jquery.dataTables.js" type="text/javascript"></script>
@@ -16,22 +16,44 @@
     <script src="js/pywebget.js" type="text/javascript"></script>
 </head>
 <body>
-<div id="dt_example">
-<table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
-	<thead>
-		<tr>
-			<th width="25"></th>
-			<th width="50">Status</th>
-			<th>Filename</th>
-			<th width="100">Path</th>
-			<th width="30">Percent</th>
-			<th width="165">Created</th>
-			<th width="165">Completed</th>
-		</tr>
-	</thead>
-	<tbody>
-	</tbody>
-</table>
+<div id="toolbar" class="fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix">
+    <button id="add" class="button"><img class="toolbar_icon" title="Add" src="img/icons/plus.png"/></button>
+    <button id="pause" class="button"><img class="toolbar_icon" title="Pause" src="img/icons/pause.png"/></button>
+    <button id="resume" class="button"><img class="toolbar_icon" title="Resume" src="img/icons/play.png"/></button>
+    <button id="delete" class="button"><img class="toolbar_icon" title="Delete" src="img/icons/delete.png"/></button>
+</div>
+<div id="download_list_wrapper">
+    <table cellpadding="0" cellspacing="0" border="0" class="display" id="download_list_table">
+        <thead>
+        <tr>
+            <th width="25"></th>
+            <th width="50">Status</th>
+            <th>Filename</th>
+            <th width="100">Path</th>
+            <th width="30">Percent</th>
+            <th width="165">Created</th>
+            <th width="165">Completed</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+<div id="add_task" class="dialog" style="display:none">
+    <table>
+        <tr>
+            <td>URL(s)</td>
+            <td><textarea id="urls" class="text"></textarea></td>
+        </tr>
+        <tr>
+            <td>Cookie</td>
+            <td><input id="cookie" type="text" class="text"/></td>
+        </tr>
+        <tr>
+            <td>Referrer</td>
+            <td><input id="referrer" type="text" class="text"/></td>
+        </tr>
+    </table>
 </div>
 </body>
 </html>
