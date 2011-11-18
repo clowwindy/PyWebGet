@@ -9,6 +9,11 @@ STATUS_QUEUED = 0
 STATUS_DOWNLOADING = 1
 STATUS_PAUSED = 2
 STATUS_COMPLETED = 3
+STATUS_DELETED = 128
+
+ERROR_UNKNOWN = 0
+ERROR_PAUSED = 1
+ERROR_DELETED = 2
 
 def str_by_status(status):
     if status == STATUS_QUEUED:
@@ -22,7 +27,6 @@ def str_by_status(status):
 
 class Task(object):
     task_id = -1
-    completed_size = 0
     speed = 0
     retry_count = 0
     download_path = "."
@@ -45,10 +49,6 @@ class Task(object):
             import os, sys, urllib2
             cur_length = 0
             url = self.task.url
-
-            # Update filename from URL
-            if self.task.filename is None:
-                self.task.filename = self._get_filename_by_url(self.task.url)
                 
             filename = self.download_path + "/" +self.task.filename
             if os.path.exists(filename):
@@ -65,18 +65,20 @@ class Task(object):
                 if netfile.code == 200:
                     f = open(filename,'wb',BUF_SIZE)
                 elif netfile.code == 206:
-                    self.completed_size += cur_length
+                    self.task.completed_size += cur_length
                     f = open(filename,'ab',BUF_SIZE)
                 else:
                     #TODO 处理301等情况
                     raise
                 data = netfile.read(CHUNK_SIZE)
                 
-                self.completed_size = cur_length
+                self.task.completed_size = cur_length
+
+                # TODO 处理content-disposition Header，更新文件名
 
                 # Download
                 while data and self.task.status == STATUS_DOWNLOADING:
-                    self.completed_size += len(data)
+                    self.task.completed_size += len(data)
                     f.write(data)
                     f.flush()
                     data = netfile.read(CHUNK_SIZE)
@@ -84,10 +86,15 @@ class Task(object):
                 f.flush()
                 f.close()
 
-                if self.task.status == STATUS_DOWNLOADING and self.oncomplete:
+                if self.oncomplete:
                     self.oncomplete(self)
                 elif self.onerror:
-                    self.onerror(self)
+                    if self.task.status == STATUS_PAUSED or self.task.status == STATUS_QUEUED:
+                        self.onerror(self, ERROR_PAUSED)
+                    elif self.task.status == STATUS_DELETED:
+                        self.onerror(self, ERROR_DELETED)
+                    else:
+                        self.onerror(self, ERROR_UNKNOWN)
             else:
                 self.oncomplete(self)
         except Exception:
@@ -96,14 +103,3 @@ class Task(object):
             if self.onerror:
                 self.onerror(self)
 
-    def _get_filename_by_url(self, url):
-        try:
-            import re
-            result = re.match(r"[^:]+://[^/]+/?([^?#]*)",url).groups()[0]
-            result = result.split('/')[-1]
-            if result:
-                return result
-            else:
-                return "download"
-        except Exception:
-            return "download"

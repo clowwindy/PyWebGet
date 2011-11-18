@@ -20,10 +20,43 @@ class add_task:
         global controller
         common_setup()
         try:
-            data = json.loads(web.input()['data'])
+            data = json.loads(web.data())
             #TODO: 支持多个URL
             controller.add_task(data['urls'], data['cookie'], data['referrer'])
-            return "'OK'"
+            return '"OK"'
+        except Exception, e:
+            return json.dumps(unicode(e))
+
+class pause_tasks:
+    def POST(self):
+        global controller
+        common_setup()
+        try:
+            data = json.loads(web.data())
+            controller.pause_tasks(data)
+            return '"OK"'
+        except Exception, e:
+            return json.dumps(unicode(e))
+        
+class resume_tasks:
+    def POST(self):
+        global controller
+        common_setup()
+        try:
+            data = json.loads(web.data())
+            controller.resume_tasks(data)
+            return '"OK"'
+        except Exception, e:
+            return json.dumps(unicode(e))
+        
+class remove_tasks:
+    def POST(self):
+        global controller
+        common_setup()
+        try:
+            data = json.loads(web.data())
+            controller.remove_tasks(data)
+            return '"OK"'
         except Exception, e:
             return json.dumps(unicode(e))
 
@@ -54,6 +87,9 @@ def run():
       '/', 'index',
       '/task_list', 'task_list',
       '/add_task', 'add_task',
+      '/pause_tasks', 'pause_tasks',
+      '/resume_tasks', 'resume_tasks',
+      '/remove_tasks', 'remove_tasks',
     )
 
     my_app = web.application(urls, globals(),autoreload=False)

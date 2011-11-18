@@ -28,13 +28,16 @@ function str_by_status(status) {
 function load_data() {
     window.oTable = $('#download_list_table').dataTable({
 //        "bProcessing": true,
-        "bDestroying": true,
+        "bDestroy": true,
         "sAjaxSource": "/task_list",
         "sScrollY": 400,
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "bAutoWidth": true,
         "bStateSave": true,
+        "oLanguage": {
+            "sEmptyTable": "Click Add button to add tasks."
+        },
         "aLengthMenu": [
             [25, 50, 100, -1],
             [25, 50, 100, "All"]
@@ -63,7 +66,7 @@ function load_data() {
             },
             {
                 "fnRender": function (oObj) {
-                    return "<input type='checkbox' id='task_" + oObj.aData["id"] + "' />";
+                    return "<input type='checkbox' class='taskid_checkbox' taskid='" + oObj.aData["id"] + "' />";
                 },
                 "aTargets": [ 0 ]
             },
@@ -79,6 +82,10 @@ function load_data() {
     });
 }
 
+function reload_data(){
+    load_data();
+}
+
 jQuery.fn.dataTableExt.aTypes.push(
     function (sData) {
         return 'html';
@@ -87,9 +94,6 @@ jQuery.fn.dataTableExt.aTypes.push(
 $(function() {
     load_data();
     $(".button").button();
-    $("a", ".demo").click(function() {
-        return false;
-    });
     set_table_size();
     $("#add").click(function() {
         $("#add_task").dialog({
@@ -98,20 +102,23 @@ $(function() {
             minHeight:286,
             minWidth:390,
             buttons: { "Ok": function() {
-                    add_task();
-                    $(this).dialog("close");
-                },
+                add_task();
+                $(this).dialog("close");
+            },
                 "Cancel": function() {
                     $(this).dialog("close");
                 }
             }
         });
-        $( "#add_task" ).dialog({
-           resize: function(event, ui) {
+        $("#add_task").dialog({
+            resize: function(event, ui) {
                 //TODO: resize textarea
-           }
+            }
         });
     });
+    $("#pause").click(pause_tasks);
+    $("#resume").click(resume_tasks);
+    $("#remove").click(remove_tasks);
 });
 
 function set_table_size() {
@@ -130,18 +137,75 @@ $(window).resize(function() {
     set_table_size();
 });
 
-function add_task(){
+function add_task() {
     var data = JSON.stringify({
         "urls":$("#urls").val(),
         "cookie":$("#cookie").val(),
         "referrer":$("#referrer").val()
     });
-    $.ajax("/add_task",{
-        data: {data:data},
+    $.ajax("/add_task", {
+        data: data,
         type: "POST",
         dataType: "json",
-        success: function(d){
-            alert(d);
+        success: function(d) {
+            if (d != 'OK') {
+                alert(d);
+            } else {
+                reload_data();
+            }
+        }
+    });
+}
+function selected_ids() {
+    var ids = [];
+    $(".taskid_checkbox:checked").each(function() {
+        ids.push(+this.getAttribute('taskid'));
+    });
+    return ids;
+}
+function remove_tasks() {
+    var data = JSON.stringify(selected_ids());
+    $.ajax("/remove_tasks", {
+        data: data,
+        type: "POST",
+        dataType: "json",
+        success: function(d) {
+            if (d != 'OK') {
+                alert(d);
+            } else {
+                alert('reload_data!');
+                reload_data();
+            }
+        }
+    });
+}
+function resume_tasks() {
+    var data = JSON.stringify(selected_ids());
+    $.ajax("/resume_tasks", {
+        data: data,
+        type: "POST",
+        dataType: "json",
+        success: function(d) {
+            if (d != 'OK') {
+                alert(d);
+            } else {
+                reload_data();
+            }
+        }
+    });
+}
+function pause_tasks() {
+    var data = JSON.stringify(selected_ids());
+    $.ajax("/pause_tasks", {
+        data: data,
+        type: "POST",
+        dataType: "json",
+        success: function(d) {
+            if (d != 'OK') {
+                alert(d);
+            } else {
+                reload_data();
+            }
         }
     });
 }

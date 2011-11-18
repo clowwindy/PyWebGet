@@ -2,7 +2,7 @@
 
 __author__ = 'clowwindy'
 
-import web, task, threading
+import web, task, threading, types, time
 from utils import log
 DB_NAME = 'db.sqlite3.db'
 DB_TYPE = 'sqlite'
@@ -26,7 +26,6 @@ class Controller(object):
         db.update('Task', where="status = %d" % task.STATUS_DOWNLOADING, status = "%d" % task.STATUS_QUEUED)
  
     def update_tasks(self):
-        
         #获取所有任务
         db = self._db()
         tasks = db.select('Task')
@@ -77,29 +76,75 @@ class Controller(object):
         import re
         if re.match(r"[^:]+://[^/]+/?([^?#]*)",url):
             db = self._db()
-            db.insert('Task', url=url, cookie=cookie, referrer=referrer)
+            db.insert('Task', url=url,
+                      cookie=cookie,
+                      referrer=referrer,
+                      filename=self._get_filename_by_url(url),
+                      date_created=time.time())
             self.update_event.set()
+            log("add task: "+url)
         else:
+            log("add task: URL is not valid:: "+url)
             raise AssertionError("URL is not valid: " + url)
 
-    def pause_task(self, a_task=None, task_id=None):
-        if a_task is None and task_id is None:
-            raise Exception("task or task_id must be set!")
-        if task_id is None:
+    def pause_task(self, a_task):
+        task_id = a_task
+        if not type(a_task) is types.IntType:
             task_id = a_task.id
         db = self._db()
-        self._update_task_status(db, task.STATUS_PAUSED, task_id=task_id)
-        for a_task_1 in self.tasks:
-            if task_id == a_task_1.id:
-                a_task_1.status = task.STATUS_PAUSED
+        status = self._get_task_status(db, task_id)
+        if status == task.STATUS_DOWNLOADING or status == task.STATUS_QUEUED:
+            self._update_task_status(db, task.STATUS_PAUSED, task_id)
+            for a_task_1 in self.tasks:
+                if task_id == a_task_1.id:
+                    a_task_1.status = task.STATUS_PAUSED
                 
+    def resume_task(self, a_task, set_update_event = True):
+        task_id = a_task
+        if not type(a_task) is types.IntType:
+            task_id = a_task.id
+        db = self._db()
+        status = self._get_task_status(db, task_id)
+        if status == task.STATUS_PAUSED:
+            self._update_task_status(db, task.STATUS_QUEUED, task_id)
+            for a_task_1 in self.tasks:
+                if task_id == a_task_1.id:
+                    a_task_1.status = task.STATUS_QUEUED
+            if set_update_event:
+                self.update_event.set()
+
+    def remove_task(self, a_task):
+        task_id = a_task
+        if not type(a_task) is types.IntType:
+            task_id = a_task.id
+        db = self._db()
+        status = self._get_task_status(db, task_id)
+        self._update_task_status(db, task.STATUS_DELETED, task_id)
+        if status == task.STATUS_DOWNLOADING:
+            # 如果正在下载，通知下载线程停止下载，并删除
+            for a_task_1 in self.tasks:
+                if task_id == a_task_1.id:
+                    a_task_1.status = task.STATUS_DELETED
+        else:
+            # 直接删除
+            db.delete('Task',  where="id = %d" % task_id)
     
-    def remove_task(self):
-        pass
+    def pause_tasks(self, tasks):
+        for a_task in tasks:
+            self.pause_task(a_task)
+
+    def resume_tasks(self, tasks):
+        for a_task in tasks:
+            self.resume_task(a_task,set_update_event=False)
+        self.update_event.set()
+
+    def remove_tasks(self, tasks):
+        for a_task in tasks:
+            self.remove_task(a_task)
     
     def task_list(self):
         db = self._db()
-        tasks = db.select('Task').list()
+        tasks = db.select('Task', where="status <> %d" % task.STATUS_DELETED).list()
         #合并速度和进度信息
         for a_task in tasks:
             found = False
@@ -118,22 +163,42 @@ class Controller(object):
     def _db(self):
         return web.database(dbn='sqlite', db=DB_NAME)
 
-    def _update_task_status(self, db, status, a_task=None, task_id=None):
-        if a_task is None and task_id is None:
-            raise Exception("task or task_id must be set!")
-        if task_id is None:
+    def _update_task_status(self, db, status, a_task):
+        task_id = a_task
+        if not type(a_task) is types.IntType:
             task_id = a_task.id
         db.update('Task', where="id = %d" % task_id, status = "%d" % status)
 
-    def _onerror(self, a_task):
-        #TODO将下载进度等状态保存到数据库
-        pass
+    def _get_task_status(self, db, a_task):
+        task_id = a_task
+        if not type(a_task) is types.IntType:
+            task_id = a_task.id
+        return db.select('Task', where="id = %d" % task_id)[0].status
+
+    def _onerror(self, a_task, error_code):
+        db = self._db()
+        if error_code == task.ERROR_DELETED:
+            db.delete('Task',  where="id = %d" % a_task.id)
+        else:
+            db.update('Task', where="id = %d" % a_task.id, completed_size = "%d" % a_task.completed_size, filename=a_task.filename)
+        log("error %s: %s" + (error_code, a_task.url))
+        
     def _oncomplete(self, a_task):
         db = self._db()
         self._update_task_status(db, task.STATUS_COMPLETED, a_task)
-        import time
-        #TODO将下载进度等状态保存到数据库
-        db.update('Task', where="id = %d" % a_task.id, date_completed = "%d" % time.time(), filename=a_task.filename)
+        db.update('Task', where="id = %d" % a_task.id, date_completed = "%d" % time.time(),completed_size = "%d" % a_task.completed_size, filename=a_task.filename)
         log("complete: "+a_task.url)
         self.update_event.set()
-        
+
+
+    def _get_filename_by_url(self, url):
+        try:
+            import re
+            result = re.match(r"[^:]+://[^/]+/?([^?#]*)",url).groups()[0]
+            result = result.split('/')[-1]
+            if result:
+                return result
+            else:
+                return "download"
+        except Exception:
+            return "download"
