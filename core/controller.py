@@ -97,7 +97,7 @@ class Controller(object):
             self._update_task_status(db, task.STATUS_PAUSED, task_id)
             for a_task_1 in self.tasks:
                 if task_id == a_task_1.id:
-                    a_task_1.status = task.STATUS_PAUSED
+                    a_task_1.task.status = task.STATUS_PAUSED
                 
     def resume_task(self, a_task, set_update_event = True):
         task_id = a_task
@@ -107,9 +107,10 @@ class Controller(object):
         status = self._get_task_status(db, task_id)
         if status == task.STATUS_PAUSED:
             self._update_task_status(db, task.STATUS_QUEUED, task_id)
-            for a_task_1 in self.tasks:
-                if task_id == a_task_1.id:
-                    a_task_1.status = task.STATUS_QUEUED
+            # 不改变内存中任务的状态，注释掉
+#            for a_task_1 in self.tasks:
+#                if task_id == a_task_1.id:
+#                    a_task_1.task.status = task.STATUS_QUEUED
             if set_update_event:
                 self.update_event.set()
 
@@ -124,7 +125,7 @@ class Controller(object):
             # 如果正在下载，通知下载线程停止下载，并删除
             for a_task_1 in self.tasks:
                 if task_id == a_task_1.id:
-                    a_task_1.status = task.STATUS_DELETED
+                    a_task_1.task.status = task.STATUS_DELETED
         else:
             # 直接删除
             db.delete('Task',  where="id = %d" % task_id)
@@ -181,7 +182,7 @@ class Controller(object):
             db.delete('Task',  where="id = %d" % a_task.id)
         else:
             db.update('Task', where="id = %d" % a_task.id, completed_size = "%d" % a_task.completed_size, filename=a_task.filename)
-        log("error %s: %s" + (error_code, a_task.url))
+        log("error %s: %s" % (error_code, a_task.url))
         
     def _oncomplete(self, a_task):
         db = self._db()

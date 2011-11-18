@@ -45,6 +45,8 @@ class Task(object):
         self.task = task
 
     def download(self):
+        f = None
+        netfile = None
         try:
             import os, sys, urllib2
             cur_length = 0
@@ -82,24 +84,26 @@ class Task(object):
                     f.write(data)
                     f.flush()
                     data = netfile.read(CHUNK_SIZE)
-                netfile.close()
                 f.flush()
-                f.close()
 
-                if self.oncomplete:
-                    self.oncomplete(self)
-                elif self.onerror:
-                    if self.task.status == STATUS_PAUSED or self.task.status == STATUS_QUEUED:
+                if self.task.status == STATUS_PAUSED or self.task.status == STATUS_QUEUED:
+                    if self.onerror:
                         self.onerror(self, ERROR_PAUSED)
-                    elif self.task.status == STATUS_DELETED:
+                elif self.task.status == STATUS_DELETED:
+                    if self.onerror:
                         self.onerror(self, ERROR_DELETED)
-                    else:
-                        self.onerror(self, ERROR_UNKNOWN)
+                else:
+                    if self.oncomplete:
+                        self.oncomplete(self)
             else:
                 self.oncomplete(self)
         except Exception:
             import traceback
             traceback.print_exc()
             if self.onerror:
-                self.onerror(self)
-
+                self.onerror(self, ERROR_UNKNOWN)
+        finally:
+            if f:
+                f.close()
+            if netfile:
+                netfile.close()
