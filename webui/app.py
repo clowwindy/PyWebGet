@@ -19,6 +19,7 @@ class add_task:
     def POST(self):
         global controller
         common_setup()
+        web.header('Content-Type', 'application/json')
         try:
             data = json.loads(web.data())
             #TODO: 支持多个URL
@@ -31,6 +32,7 @@ class pause_tasks:
     def POST(self):
         global controller
         common_setup()
+        web.header('Content-Type', 'application/json')
         try:
             data = json.loads(web.data())
             controller.pause_tasks(data)
@@ -42,6 +44,7 @@ class resume_tasks:
     def POST(self):
         global controller
         common_setup()
+        web.header('Content-Type', 'application/json')
         try:
             data = json.loads(web.data())
             controller.resume_tasks(data)
@@ -53,6 +56,7 @@ class remove_tasks:
     def POST(self):
         global controller
         common_setup()
+        web.header('Content-Type', 'application/json')
         try:
             data = json.loads(web.data())
             controller.remove_tasks(data)
@@ -72,7 +76,7 @@ class task_list:
 #            a_task.date_completed = utils.timestamp_repr(a_task.date_completed)
 #            a_task.date_created = utils.timestamp_repr(a_task.date_created)
         import json
-        web.header('Content-Type', 'application/x-javascript')
+        web.header('Content-Type', 'application/json')
         common_setup()
         return json.dumps({"tasks":tasks})
 

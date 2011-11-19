@@ -43,7 +43,6 @@ function str_by_status(status) {
 }
 
 function init_table() {
-    // to be deprecated
     window.oTable = $('#download_list_table').dataTable({
 //        "bProcessing": true,
 //        "bDestroy": true,
