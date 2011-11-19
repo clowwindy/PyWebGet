@@ -42,13 +42,13 @@ function init_table() {
     // to be deprecated
     window.oTable = $('#download_list_table').dataTable({
 //        "bProcessing": true,
-        "bDestroy": true,
+//        "bDestroy": true,
 //        "sAjaxSource": "/task_list",
         "sScrollY": 400,
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "bAutoWidth": true,
-        "bStateSave": true,
+        "bStateSave": false,
         "oLanguage": {
             "sEmptyTable": "Click Add button to add tasks."
         },
@@ -126,7 +126,7 @@ function render_row(row) {
 
 function get_col_index_by_name(name){
     for(var i in columns){
-        if(columns[i]["mDataProp"]){
+        if(columns[i]["mDataProp"] == name){
             return i;
         }
     }
@@ -136,7 +136,7 @@ function get_col_index_by_name(name){
 function reload_table() {
     //和旧数据对比，看看哪些少了，删除
     callback_on_complement(old_data.tasks, data.tasks, function(id) {
-        oTable.remove(find_table_row_by_id(id));
+        oTable.fnDeleteRow(find_table_row_by_id(id));
     });
     //看看哪些多了，増行
     callback_on_complement(data.tasks, old_data.tasks, function(id, row) {
