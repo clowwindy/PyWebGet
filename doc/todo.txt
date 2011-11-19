@@ -1,0 +1,152 @@
+﻿
+需求：
+	输入下载链接和cookie、referrer、相对目录设置
+	实现断点续传
+	//实现限速
+	限制下载并发数，自动排队下载
+	显示下载任务，下载进度，下载速度
+	暂停，删除，调整顺序
+	清空已完成的任务记录
+	尽量降低不必要的磁盘IO数量
+
+界面设计：
+	按钮：添加，暂停，恢复，删除
+	表格：复选框，状态，文件名，目录，大小，进度，速度，添加时间，完成时间
+	
+模块设计：
+	一个公用的内存存储区，每个任务中存储：
+		completed_size
+		speed
+		retry_count
+
+	下载守护进程
+		定时查询数据库，获取下载任务
+		创建下载目录，设置好权限
+		按顺序下载，完成或失败后更新状态
+		//更新速度限制
+		暂停和删除
+		把进度和速度信息存进内存存储区
+		
+	Web
+		web.py网站
+		添加任务，存进数据库
+		从数据库获取任务和进度信息，显示
+		//设置速度限制
+		暂停，删除
+		调整顺序
+		清空已完成的任务记录
+
+数据库设计：
+	Task:
+		id
+		url
+		status
+		filename
+		dir		保存文件的相对目录
+		cookie
+		referrer
+		priority	下载优先级
+		total_size
+		date_create		创建任务的时间
+		date_complete	完成时间
+	
+	Setting:
+		id
+		key
+		value
+	
+status:
+	刚添加
+	下载中
+	排队中
+	暂停中
+	已完成
+	
+可设置参数：
+	download_path 保存下载文件的目录
+	max_speed
+	max_tasks	下载并发数
+	user_agent
+	
+	
+	
+技术研究：
+	web.py
+		serve静态文件
+		线程模型
+		数据库
+	pycurl
+		多任务下载（curlmulti实在看不懂，用多线程实现）
+		添加cookie
+		设置referrer
+		保存到文件
+		获取进度 //和速度
+		暂停和取消
+		错误处理
+		//限速
+		
+		
+详细设计：
+	core.TaskInfo:
+		completed_size
+		speed
+		retry_count
+		download()
+		onerror
+		oncomplete
+		
+	core.Task:
+		id
+		url
+		status
+		filename
+		dir		保存文件的相对目录
+		cookie
+		referrer
+		priority	下载优先级
+		total_size
+		date_create		创建任务的时间
+		date_complete	完成时间
+		
+	core.DownloadController:
+		threads
+		taskinfos
+		run()
+		add_task()
+		pause_task()
+		remove_task()
+		task_list()
+		
+	webui.TaskList:
+		GET()
+	webui.AddTask:
+		GET()
+	webui.AddTasks:
+		GET()
+	webui.PauseTask:
+		GET()
+	webui.RemoveTask:
+		GET()
+	
+	
+milestone：
+	排队下载，断点续传	OK
+	显示正在下载的任务	OK
+	显示全部任务	OK
+	添加，暂停，恢复，删除	OK
+	显示下载进度
+	显示速度和剩余时间
+	相对目录，Cookie，Referrer
+	自动设置文件名（后面加1 2 3……）
+	未完成文件加.part
+	调整顺序
+	下载保存目录设定
+	自动检查配置错误，例如下载保存目录不存在
+	程序名称和版本，User-Agent，License
+	界面美化
+	前端输入校验
+	命令行解析，可以指定配置文件和数据库目录
+	数据库不存在时可以自动创建数据库
+	安装脚本
+	debian启动脚本
+	打包成deb
