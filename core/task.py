@@ -2,7 +2,7 @@
 
 __author__ = 'clowwindy'
 
-BUF_SIZE = 32768
+BUF_SIZE = 256 * 1024
 CHUNK_SIZE = 4096
 
 STATUS_QUEUED = 0
