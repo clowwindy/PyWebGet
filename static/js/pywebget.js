@@ -152,6 +152,7 @@ function reload_table() {
         oTable.fnUpdate(rendered_row.percent, index, get_col_index_by_name('percent'));
         oTable.fnUpdate(rendered_row.date_completed, index, get_col_index_by_name('date_completed'));
     });
+    // TODO: optimize by redrawing table only once
 }
 
 $(function() {

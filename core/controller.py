@@ -7,7 +7,7 @@ from utils import log
 DB_NAME = 'db.sqlite3.db'
 DB_TYPE = 'sqlite'
 
-CHECK_INTERVAL = 30
+CHECK_INTERVAL = 300
 
 STATUS_RUNNING = 1
 STATUS_STOPPING = 2
