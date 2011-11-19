@@ -1,3 +1,10 @@
+var RELOAD_INTERVAL = 3000;
+
+var STATUS_QUEUED = 0;
+var STATUS_DOWNLOADING = 1;
+var STATUS_PAUSED = 2;
+var STATUS_COMPLETED = 3;
+
 var strings = {
     "Add Task":"Add Task"
 };
@@ -10,6 +17,7 @@ var columns = [
             { "mDataProp": "dir" },
             { "mDataProp": "total_size" },
             { "mDataProp": "percent" },
+            { "mDataProp": "speed" },
             { "mDataProp": "completed_size" },
             { "mDataProp": "date_created" },
             { "mDataProp": "date_completed" }
@@ -22,10 +30,6 @@ jQuery.fn.dataTableExt.aTypes.push(
 );
 
 function str_by_status(status) {
-    var STATUS_QUEUED = 0;
-    var STATUS_DOWNLOADING = 1;
-    var STATUS_PAUSED = 2;
-    var STATUS_COMPLETED = 3;
     if (status == STATUS_QUEUED)
         return "Queued";
     else if (status == STATUS_DOWNLOADING)
@@ -110,6 +114,35 @@ function find_table_row_by_id(id) {
 }
 
 function render_row(row) {
+    // calculate speed
+    var speed = 0, speed_str = "";
+    if(row.status == STATUS_DOWNLOADING && window.old_data){
+        var cur_date = new Date();
+        var interval = RELOAD_INTERVAL;
+        if(window['last_check_date']){
+            interval = cur_date - window.last_check_date;
+            window.last_check_date = cur_date;
+        }
+        for(var i in old_data.tasks){
+            var old_row = old_data.tasks[i];
+            if(old_row.id == row.id){
+                var dif = row.completed_size - old_row.completed_size;
+                speed = Math.max(Math.floor(dif / interval * 1000),0);
+                if(speed){
+                    speed_str = readablize_bytes(speed)+"/s";
+                } else {
+                    speed_str = "";
+                }
+                break;
+            }
+        }
+    }
+    var percent = Math.floor(row.completed_size/row.total_size * 100);
+    if(percent){
+        percent += "%";
+    }else{
+        percent = "";
+    }
     return {
         id:row.id,
         checkbox:"<input type='checkbox' class='taskid_checkbox' taskid='" + row.id + "' />",
@@ -117,10 +150,11 @@ function render_row(row) {
         filename:row.filename,
         dir:row.dir,
         total_size:readablize_bytes(row.total_size),
-        percent:Math.floor(row.completed_size/row.total_size * 100)+"%",
+        percent:percent,
         completed_size:readablize_bytes(row.completed_size),
         date_created:timestamp_repr(row.date_created),
-        date_completed:timestamp_repr(row.date_completed)
+        date_completed:timestamp_repr(row.date_completed),
+        speed:speed_str
     };
 }
 
@@ -151,6 +185,7 @@ function reload_table() {
         oTable.fnUpdate(rendered_row.total_size, index, get_col_index_by_name('total_size'));
         oTable.fnUpdate(rendered_row.percent, index, get_col_index_by_name('percent'));
         oTable.fnUpdate(rendered_row.date_completed, index, get_col_index_by_name('date_completed'));
+        oTable.fnUpdate(rendered_row.speed, index, get_col_index_by_name('speed'));
     });
     // TODO: optimize by redrawing table only once
 }
@@ -184,6 +219,7 @@ $(function() {
     $("#pause").click(pause_tasks);
     $("#resume").click(resume_tasks);
     $("#remove").click(remove_tasks);
+    setInterval(reload_data, RELOAD_INTERVAL);
 });
 
 function set_table_size() {

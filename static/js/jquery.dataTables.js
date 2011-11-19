@@ -6147,7 +6147,7 @@
 			{
 				if ( _oExt.sErrMode == 'alert' )
 				{
-					alert( sAlert );
+//					alert( sAlert );
 				}
 				else
 				{

@@ -63,42 +63,42 @@ class Task(object):
             opener = urllib2.build_opener()
             netfile = opener.open(request)
             headers = netfile.headers.dict
-            if not headers.has_key('content-length') or int(headers['content-length']) > cur_length:
-                if netfile.code == 200:
-                    f = open(filename,'wb',BUF_SIZE)
-                elif netfile.code == 206:
-                    self.task.completed_size += cur_length
-                    f = open(filename,'ab',BUF_SIZE)
-                else:
-                    #TODO 处理301等情况
-                    raise
-                if headers.has_key('content-length'):
-                    self.task.total_size = int(headers['content-length'])
-                    if self.onupdating_total_size:
-                        self.onupdating_total_size(self)
 
-                data = netfile.read(CHUNK_SIZE)
-                
+            if netfile.code == 200:
+                cur_length = self.task.completed_size = 0
+                f = open(filename,'wb',BUF_SIZE)
+            elif netfile.code == 206:
                 self.task.completed_size = cur_length
-
-                # TODO 处理content-disposition Header，更新文件名
-
-                # Download
-                while data and self.task.status == STATUS_DOWNLOADING:
-                    self.task.completed_size += len(data)
-                    f.write(data)
-                    f.flush()
-                    data = netfile.read(CHUNK_SIZE)
-                f.flush()
-
-                if self.task.status == STATUS_PAUSED or self.task.status == STATUS_QUEUED or self.task.status == STATUS_DELETED:
-                    if self.onstatus_change:
-                        self.onstatus_change(self)
-                else:
-                    if self.oncomplete:
-                        self.oncomplete(self)
+                f = open(filename,'ab',BUF_SIZE)
             else:
-                self.oncomplete(self)
+                #TODO 处理301等情况
+                raise
+            if headers.has_key('content-length'):
+                self.task.total_size = int(headers['content-length']) + self.task.completed_size
+                if self.onupdating_total_size:
+                    self.onupdating_total_size(self)
+
+            data = netfile.read(CHUNK_SIZE)
+
+            self.task.completed_size = cur_length
+
+            # TODO 处理content-disposition Header，更新文件名
+
+            # Download
+            while data and self.task.status == STATUS_DOWNLOADING:
+                self.task.completed_size += len(data)
+                f.write(data)
+                f.flush()
+                data = netfile.read(CHUNK_SIZE)
+            f.flush()
+
+            if self.task.status == STATUS_PAUSED or self.task.status == STATUS_QUEUED or self.task.status == STATUS_DELETED:
+                if self.onstatus_change:
+                    self.onstatus_change(self)
+            else:
+                if self.oncomplete:
+                    self.oncomplete(self)
+
         except Exception:
             import traceback
             traceback.print_exc()

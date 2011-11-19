@@ -2,7 +2,7 @@
 
 __author__ = 'clowwindy'
 
-import web, task, threading, types, time
+import web, task, threading, types, time, urllib
 from utils import log
 DB_NAME = 'db.sqlite3.db'
 DB_TYPE = 'sqlite'
@@ -100,6 +100,7 @@ class Controller(object):
             for a_task_1 in self.tasks:
                 if task_id == a_task_1.id:
                     a_task_1.task.status = task.STATUS_PAUSED
+                    db.update('Task', where="id = %d" % task_id, completed_size = "%d" % a_task_1.completed_size)
                 
     def resume_task(self, a_task, set_update_event = True):
         task_id = a_task
@@ -187,6 +188,10 @@ class Controller(object):
         if a_task.status == task.STATUS_DELETED:
             db = self._db()
             db.delete('Task',  where="id = %d" % a_task.id)
+        else:
+            db = self._db()
+            db.update('Task', where="id = %d" % a_task.id, completed_size = "%d" % a_task.completed_size, filename=a_task.filename)
+
 
     def _onupdating_total_size(self, a_task):
         db = self._db()
@@ -207,7 +212,7 @@ class Controller(object):
             result = re.match(r"[^:]+://[^/]+/?([^?#]*)",url).groups()[0]
             result = result.split('/')[-1]
             if result:
-                return result
+                return urllib.unquote(result)
             else:
                 return "download"
         except Exception:
