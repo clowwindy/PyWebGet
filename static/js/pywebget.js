@@ -2,11 +2,24 @@ var strings = {
     "Add Task":"Add Task"
 };
 var _s = strings;
+var data = {tasks:[]};
+var columns = [
+            { "mDataProp": "checkbox" },
+            { "mDataProp": "status" },
+            { "mDataProp": "filename" },
+            { "mDataProp": "dir" },
+            { "mDataProp": "total_size" },
+            { "mDataProp": "percent" },
+            { "mDataProp": "completed_size" },
+            { "mDataProp": "date_created" },
+            { "mDataProp": "date_completed" }
+        ];
 
-function timestamp_repr(t) {
-    var d = new Date(t * 1000);
-    return d.toString('yyyy-MM-dd HH:mm:ss');
-}
+jQuery.fn.dataTableExt.aTypes.push(
+    function (sData) {
+        return 'html';
+    }
+);
 
 function str_by_status(status) {
     var STATUS_QUEUED = 0;
@@ -25,12 +38,12 @@ function str_by_status(status) {
         return "";
 }
 
-function load_data() {
+function init_table() {
     // to be deprecated
     window.oTable = $('#download_list_table').dataTable({
 //        "bProcessing": true,
         "bDestroy": true,
-        "sAjaxSource": "/task_list",
+//        "sAjaxSource": "/task_list",
         "sScrollY": 400,
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
@@ -43,79 +56,107 @@ function load_data() {
             [25, 50, 100, -1],
             [25, 50, 100, "All"]
         ],
-        "aoColumns": [
-            { "mDataProp": "id" },
-            { "mDataProp": "status" },
-            { "mDataProp": "filename" },
-            { "mDataProp": "dir" },
-            { "mDataProp": "total_size" },
-            { "mDataProp": "percent" },
-            { "mDataProp": "completed_size" },
-            { "mDataProp": "date_created" },
-            { "mDataProp": "date_completed" }
-        ],
-        "aoColumnDefs": [
-            {
-                "fnRender": function (oObj) {
-                    return timestamp_repr(oObj.aData["date_created"]);
-                },
-                "aTargets": [ -2 ]
-            },
-            {
-                "fnRender": function (oObj) {
-                    return timestamp_repr(oObj.aData["date_completed"]);
-                },
-                "aTargets": [ -1 ]
-            },
-            {
-                "fnRender": function (oObj) {
-                    return "<input type='checkbox' class='taskid_checkbox' taskid='" + oObj.aData["id"] + "' />";
-                },
-                "aTargets": [ 0 ]
-            },
-            {
-                "fnRender": function (oObj) {
-                    return str_by_status(oObj.aData["status"]);
-                },
-                "aTargets": [ 1 ]
-            },
-            {
-                "fnRender": function (oObj) {
-                    console.log(oObj);
-                    return ((oObj.aData["completed_size"] / oObj.aData["total_size"])).toFixed(2);
-                },
-                "aTargets": [ 5 ]
-            },
-            {
-                "fnRender": function (oObj) {
-                    return readablize_bytes(oObj.aData["total_size"]);
-                },
-                "aTargets": [ 4 ]
-            },
-            {
-                "fnRender": function (oObj) {
-                    return readablize_bytes(oObj.aData["completed_size"]);
-                },
-                "aTargets": [ 6 ]
-            }
-//                        { "bVisible": false,  "aTargets": [ 3 ] },
-//                        { "sClass": "center", "aTargets": [ 4 ] }
-        ]
+        "aoColumns": columns
     });
 }
 
-function reload_data(){
-    load_data();
-    // 检查删除的行，将其删除
+function reload_data() {
+    $.ajax('/task_list', {
+        dataType:"json",
+        success:function(data) {
+            window.old_data = window.data;
+            window.data = data;
+            reload_table();
+        }
+    })
 }
 
-jQuery.fn.dataTableExt.aTypes.push(
-    function (sData) {
-        return 'html';
+function callback_on_complement(array1, array2, callback) {
+    // find what does array1 have but array2 haven't
+    outer:
+        for (var i in array1) {
+            var id = array1[i].id;
+            for (var j in array2) {
+                if (id == array2[j].id) {
+                    continue outer;
+                }
+            }
+            callback(id, array1[i]);
+        }
+}
+
+function callback_on_intersection(array1, array2, callback) {
+    // find what do array1 and array2 both have
+    for (var i in array1) {
+        var id = array1[i].id;
+        for (var j in array2) {
+            if (id == array2[j].id) {
+                callback(id, array1[i], array2[j]);
+            }
+        }
     }
-);
+}
+
+function find_table_row_by_id(id) {
+    var data = oTable.fnGetData();
+    var i = 0;
+    for (var row in data) {
+        if (+data[row].id == id) {
+            return i;
+        }
+        i++;
+    }
+    return -1;
+}
+
+function render_row(row) {
+    return {
+        id:row.id,
+        checkbox:"<input type='checkbox' class='taskid_checkbox' taskid='" + row.id + "' />",
+        status:str_by_status(row.status),
+        filename:row.filename,
+        dir:row.dir,
+        total_size:readablize_bytes(row.total_size),
+        percent:Math.floor(row.completed_size/row.total_size * 100)+"%",
+        completed_size:readablize_bytes(row.completed_size),
+        date_created:timestamp_repr(row.date_created),
+        date_completed:timestamp_repr(row.date_completed)
+    };
+}
+
+function get_col_index_by_name(name){
+    for(var i in columns){
+        if(columns[i]["mDataProp"]){
+            return i;
+        }
+    }
+    return -1;
+}
+
+function reload_table() {
+    //和旧数据对比，看看哪些少了，删除
+    callback_on_complement(old_data.tasks, data.tasks, function(id) {
+        oTable.remove(find_table_row_by_id(id));
+    });
+    //看看哪些多了，増行
+    callback_on_complement(data.tasks, old_data.tasks, function(id, row) {
+        oTable.fnAddData(render_row(row));
+    });
+    //更新相同的数据对应的行里的状态、下载进度、速度信息
+    callback_on_intersection(data.tasks, old_data.tasks, function(id, row){
+        var rendered_row = render_row(row);
+        var index = find_table_row_by_id(id);
+        oTable.fnUpdate(rendered_row.status, index, get_col_index_by_name('status'));
+        oTable.fnUpdate(rendered_row.completed_size, index, get_col_index_by_name('completed_size'));
+        oTable.fnUpdate(rendered_row.total_size, index, get_col_index_by_name('total_size'));
+        oTable.fnUpdate(rendered_row.percent, index, get_col_index_by_name('percent'));
+        oTable.fnUpdate(rendered_row.date_completed, index, get_col_index_by_name('date_completed'));
+    });
+}
+
 $(function() {
-    load_data();
+    init_table();
+    reload_data();
     $(".button").button();
     set_table_size();
     $("#add").click(function() {

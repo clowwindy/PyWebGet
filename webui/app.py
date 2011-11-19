@@ -74,7 +74,7 @@ class task_list:
         import json
         web.header('Content-Type', 'application/x-javascript')
         common_setup()
-        return json.dumps({"aaData":tasks})
+        return json.dumps({"tasks":tasks})
 
 controller = None
 
