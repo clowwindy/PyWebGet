@@ -11,17 +11,17 @@ var strings = {
 var _s = strings;
 var data = {tasks:[]};
 var columns = [
-            { "mDataProp": "checkbox" },
-            { "mDataProp": "status" },
-            { "mDataProp": "filename" },
-            { "mDataProp": "dir" },
-            { "mDataProp": "total_size" },
-            { "mDataProp": "percent" },
-            { "mDataProp": "speed" },
-            { "mDataProp": "completed_size" },
-            { "mDataProp": "date_created" },
-            { "mDataProp": "date_completed" }
-        ];
+    { "mDataProp": "checkbox" },
+    { "mDataProp": "status" },
+    { "mDataProp": "filename" },
+    { "mDataProp": "dir" },
+    { "mDataProp": "total_size" },
+    { "mDataProp": "percent" },
+    { "mDataProp": "speed" },
+    { "mDataProp": "completed_size" },
+    { "mDataProp": "date_created" },
+    { "mDataProp": "date_completed" }
+];
 
 jQuery.fn.dataTableExt.aTypes.push(
     function (sData) {
@@ -116,20 +116,20 @@ function find_table_row_by_id(id) {
 function render_row(row) {
     // calculate speed
     var speed = 0, speed_str = "";
-    if(row.status == STATUS_DOWNLOADING && window.old_data){
+    if (row.status == STATUS_DOWNLOADING && window.old_data) {
         var cur_date = new Date();
         var interval = RELOAD_INTERVAL;
-        if(window['last_check_date']){
+        if (window['last_check_date']) {
             interval = cur_date - window.last_check_date;
             window.last_check_date = cur_date;
         }
-        for(var i in old_data.tasks){
+        for (var i in old_data.tasks) {
             var old_row = old_data.tasks[i];
-            if(old_row.id == row.id){
+            if (old_row.id == row.id) {
                 var dif = row.completed_size - old_row.completed_size;
-                speed = Math.max(Math.floor(dif / interval * 1000),0);
-                if(speed){
-                    speed_str = readablize_bytes(speed)+"/s";
+                speed = Math.max(Math.floor(dif / interval * 1000), 0);
+                if (speed) {
+                    speed_str = readablize_bytes(speed) + "/s";
                 } else {
                     speed_str = "";
                 }
@@ -137,10 +137,10 @@ function render_row(row) {
             }
         }
     }
-    var percent = Math.floor(row.completed_size/row.total_size * 100);
-    if(percent){
+    var percent = Math.floor(row.completed_size / row.total_size * 100);
+    if (percent) {
         percent += "%";
-    }else{
+    } else {
         percent = "";
     }
     return {
@@ -158,9 +158,9 @@ function render_row(row) {
     };
 }
 
-function get_col_index_by_name(name){
-    for(var i in columns){
-        if(columns[i]["mDataProp"] == name){
+function get_col_index_by_name(name) {
+    for (var i in columns) {
+        if (columns[i]["mDataProp"] == name) {
             return i;
         }
     }
@@ -177,17 +177,29 @@ function reload_table() {
         oTable.fnAddData(render_row(row));
     });
     //更新相同的数据对应的行里的状态、下载进度、速度信息
-    callback_on_intersection(data.tasks, old_data.tasks, function(id, row){
+    var all_same = true;
+    callback_on_intersection(data.tasks, old_data.tasks, function(id, row, row2) {
+        // optimize by updating rows changed only
+        var same = true;
+        for (var i in row) {
+            if (row[i] != row2[i]) {
+                same = false;
+                break;
+            }
+        }
+        if (same && row2.status != STATUS_DOWNLOADING ) return;
+        all_same = false;
         var rendered_row = render_row(row);
         var index = find_table_row_by_id(id);
-        oTable.fnUpdate(rendered_row.status, index, get_col_index_by_name('status'));
-        oTable.fnUpdate(rendered_row.completed_size, index, get_col_index_by_name('completed_size'));
-        oTable.fnUpdate(rendered_row.total_size, index, get_col_index_by_name('total_size'));
-        oTable.fnUpdate(rendered_row.percent, index, get_col_index_by_name('percent'));
-        oTable.fnUpdate(rendered_row.date_completed, index, get_col_index_by_name('date_completed'));
-        oTable.fnUpdate(rendered_row.speed, index, get_col_index_by_name('speed'));
+        oTable.fnUpdate(rendered_row.status, index, get_col_index_by_name('status'), false, false);
+        oTable.fnUpdate(rendered_row.completed_size, index, get_col_index_by_name('completed_size'), false, false);
+        oTable.fnUpdate(rendered_row.total_size, index, get_col_index_by_name('total_size'), false, false);
+        oTable.fnUpdate(rendered_row.percent, index, get_col_index_by_name('percent'), false, false);
+        oTable.fnUpdate(rendered_row.date_completed, index, get_col_index_by_name('date_completed'), false, false);
+        oTable.fnUpdate(rendered_row.speed, index, get_col_index_by_name('speed'), false, false);
     });
-    // TODO: optimize by redrawing table only once
+    // optimize by redrawing table only once
+    if(!all_same) oTable.fnDraw();
 }
 
 $(function() {
