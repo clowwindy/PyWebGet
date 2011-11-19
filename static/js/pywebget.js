@@ -26,6 +26,7 @@ function str_by_status(status) {
 }
 
 function load_data() {
+    // to be deprecated
     window.oTable = $('#download_list_table').dataTable({
 //        "bProcessing": true,
         "bDestroy": true,
@@ -47,7 +48,9 @@ function load_data() {
             { "mDataProp": "status" },
             { "mDataProp": "filename" },
             { "mDataProp": "dir" },
+            { "mDataProp": "total_size" },
             { "mDataProp": "percent" },
+            { "mDataProp": "completed_size" },
             { "mDataProp": "date_created" },
             { "mDataProp": "date_completed" }
         ],
@@ -75,6 +78,25 @@ function load_data() {
                     return str_by_status(oObj.aData["status"]);
                 },
                 "aTargets": [ 1 ]
+            },
+            {
+                "fnRender": function (oObj) {
+                    console.log(oObj);
+                    return ((oObj.aData["completed_size"] / oObj.aData["total_size"])).toFixed(2);
+                },
+                "aTargets": [ 5 ]
+            },
+            {
+                "fnRender": function (oObj) {
+                    return readablize_bytes(oObj.aData["total_size"]);
+                },
+                "aTargets": [ 4 ]
+            },
+            {
+                "fnRender": function (oObj) {
+                    return readablize_bytes(oObj.aData["completed_size"]);
+                },
+                "aTargets": [ 6 ]
             }
 //                        { "bVisible": false,  "aTargets": [ 3 ] },
 //                        { "sClass": "center", "aTargets": [ 4 ] }
@@ -84,6 +106,7 @@ function load_data() {
 
 function reload_data(){
     load_data();
+    // 检查删除的行，将其删除
 }
 
 jQuery.fn.dataTableExt.aTypes.push(
