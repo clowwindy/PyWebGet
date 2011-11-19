@@ -12,8 +12,6 @@ STATUS_COMPLETED = 3
 STATUS_DELETED = 128
 
 ERROR_UNKNOWN = 0
-ERROR_PAUSED = 1
-ERROR_DELETED = 2
 
 def str_by_status(status):
     if status == STATUS_QUEUED:
@@ -34,6 +32,8 @@ class Task(object):
 
     onerror = None
     oncomplete = None
+    onstatus_change = None
+    onupdating_total_size = None
 
     def __getattr__(self, key):
         try:
@@ -72,6 +72,11 @@ class Task(object):
                 else:
                     #TODO 处理301等情况
                     raise
+                if headers.has_key('content-length'):
+                    self.task.total_size = int(headers['content-length'])
+                    if self.onupdating_total_size:
+                        self.onupdating_total_size(self)
+
                 data = netfile.read(CHUNK_SIZE)
                 
                 self.task.completed_size = cur_length
@@ -86,12 +91,9 @@ class Task(object):
                     data = netfile.read(CHUNK_SIZE)
                 f.flush()
 
-                if self.task.status == STATUS_PAUSED or self.task.status == STATUS_QUEUED:
-                    if self.onerror:
-                        self.onerror(self, ERROR_PAUSED)
-                elif self.task.status == STATUS_DELETED:
-                    if self.onerror:
-                        self.onerror(self, ERROR_DELETED)
+                if self.task.status == STATUS_PAUSED or self.task.status == STATUS_QUEUED or self.task.status == STATUS_DELETED:
+                    if self.onstatus_change:
+                        self.onstatus_change(self)
                 else:
                     if self.oncomplete:
                         self.oncomplete(self)

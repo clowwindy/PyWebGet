@@ -14,7 +14,7 @@ body {
 }
 .text,#download_list_table_filter input {
     border: 1px solid #aaaaaa;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) inset;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) inset;
 }
 #download_list_table_filter input {
     border-radius: 10px 10px 10px 10px;
@@ -30,7 +30,7 @@ body {
 }
 .ui-dialog {
     border-radius: 7px;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.7);
+    box-shadow:  0 10px 30px rgba(0, 0, 0, 0.33);
 }
 
 .ui-button {
