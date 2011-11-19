@@ -53,6 +53,8 @@ class Controller(object):
             self.tasks.append(ti)
             ti.oncomplete = self._oncomplete
             ti.onerror = self._onerror
+            ti.onupdating_total_size = self._onupdating_total_size
+            ti.onstatus_change = self._onstatus_change
             ti.download()
         finally:
             self.lock.acquire()
@@ -178,11 +180,18 @@ class Controller(object):
 
     def _onerror(self, a_task, error_code):
         db = self._db()
-        if error_code == task.ERROR_DELETED:
-            db.delete('Task',  where="id = %d" % a_task.id)
-        else:
-            db.update('Task', where="id = %d" % a_task.id, completed_size = "%d" % a_task.completed_size, filename=a_task.filename)
+        db.update('Task', where="id = %d" % a_task.id, completed_size = "%d" % a_task.completed_size, filename=a_task.filename)
         log("error %s: %s" % (error_code, a_task.url))
+
+    def _onstatus_change(self, a_task):
+        if a_task.status == task.STATUS_DELETED:
+            db = self._db()
+            db.delete('Task',  where="id = %d" % a_task.id)
+
+    def _onupdating_total_size(self, a_task):
+        db = self._db()
+        db.update('Task', where="id = %d" % a_task.id, total_size = "%d" % a_task.total_size, filename=a_task.filename)
+
         
     def _oncomplete(self, a_task):
         db = self._db()

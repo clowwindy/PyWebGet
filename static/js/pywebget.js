@@ -163,9 +163,10 @@ function selected_ids() {
     });
     return ids;
 }
-function remove_tasks() {
+
+function perform_ajax_on_selection(url) {
     var data = JSON.stringify(selected_ids());
-    $.ajax("/remove_tasks", {
+    $.ajax(url, {
         data: data,
         type: "POST",
         dataType: "json",
@@ -173,39 +174,18 @@ function remove_tasks() {
             if (d != 'OK') {
                 alert(d);
             } else {
-                alert('reload_data!');
                 reload_data();
             }
         }
     });
+}
+
+function remove_tasks() {
+    perform_ajax_on_selection("/remove_tasks");
 }
 function resume_tasks() {
-    var data = JSON.stringify(selected_ids());
-    $.ajax("/resume_tasks", {
-        data: data,
-        type: "POST",
-        dataType: "json",
-        success: function(d) {
-            if (d != 'OK') {
-                alert(d);
-            } else {
-                reload_data();
-            }
-        }
-    });
+    perform_ajax_on_selection("/resume_tasks");
 }
 function pause_tasks() {
-    var data = JSON.stringify(selected_ids());
-    $.ajax("/pause_tasks", {
-        data: data,
-        type: "POST",
-        dataType: "json",
-        success: function(d) {
-            if (d != 'OK') {
-                alert(d);
-            } else {
-                reload_data();
-            }
-        }
-    });
+    perform_ajax_on_selection("/pause_tasks");
 }
