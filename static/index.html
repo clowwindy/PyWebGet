@@ -21,7 +21,8 @@
     <button id="add" title="Add" class="button"><img class="toolbar_icon" src="img/icons/plus.png"/></button>
     <button id="pause" title="Pause" class="button"><img class="toolbar_icon" src="img/icons/pause.png"/></button>
     <button id="resume" title="Resume" class="button"><img class="toolbar_icon" src="img/icons/play.png"/></button>
-    <button id="remove" title="Delete" class="button"><img class="toolbar_icon" src="img/icons/delete.png"/></button>
+    <button id="remove" title="Delete" class="button"><img class="toolbar_icon" src="img/icons/trash.png"/></button>
+    <button id="preferences" title="Delete" class="button"><img class="toolbar_icon" src="img/icons/preferences.png"/></button>
 </div>
 <div id="download_list_wrapper">
     <table cellpadding="0" cellspacing="0" border="0" class="display" id="download_list_table">
@@ -44,7 +45,7 @@
         </tbody>
     </table>
 </div>
-<div id="add_task" class="dialog" style="display:none">
+<div id="add_task_dialog" class="dialog" style="display:none">
     <table style="width:100%">
         <tr>
             <td style="width:55px">URL(s)</td>
@@ -57,6 +58,26 @@
         <tr>
             <td>Referrer</td>
             <td><input id="referrer" type="text" class="text"/></td>
+        </tr>
+    </table>
+</div>
+<div id="preferences_dialog" class="dialog" style="display:none">
+    <table style="width:100%">
+        <tr>
+            <td style="width:105px">Download dir</td>
+            <td><input id="download_path" type="text" class="text"/></td>
+        </tr>
+        <tr>
+            <td>Buffer limit (per thread)</td>
+            <td><input id="buf_size" type="text" class="text number"/></td>
+        </tr>
+        <tr>
+            <td>Thread limit</td>
+            <td><input id="thread_limit" type="text" class="text number"/></td>
+        </tr>
+        <tr>
+            <td>Max retries</td>
+            <td><input id="retry_limit" type="text" class="text number"/></td>
         </tr>
     </table>
 </div>

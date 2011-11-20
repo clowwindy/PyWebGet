@@ -9,11 +9,13 @@ defaults = Storage({
     "download_path" : ".",
     "buf_size" : 256 * 1024,
     "thread_limit": 2,
-    "retry_count":10,
+    "retry_limit":10,
     "auth_enabled":True,
     "auth_username":"admin",
     "auth_password":"",
 })
+
+settings_writable = ["download_path", "buf_size", "thread_limit", "retry_limit"]
 
 def hash_password(pwd):
     import hashlib

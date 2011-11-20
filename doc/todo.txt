@@ -61,7 +61,7 @@ status:
 可设置参数：
 	download_path 保存下载文件的目录
 	max_speed
-	max_tasks	下载并发数
+	thread_limit	下载并发数
 	user_agent
 	
 	
@@ -144,6 +144,7 @@ milestone：
 
     配置管理：
         用户名和密码	OK
+		配置界面
         下载保存目录设定
 		下载并发数，缓存大小
         自动检查配置错误，例如下载保存目录不存在

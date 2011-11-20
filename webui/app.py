@@ -6,7 +6,7 @@ from core import task, version
 import json
 import re
 import base64
-from core.setting import hash_password
+from core.setting import hash_password, settings_writable
 
 def common_setup():
     web.header('Server', "%s/%s" % (version.APP_NAME, version.VERSION))
@@ -107,11 +107,33 @@ class task_list:
 class stop_server:
     def GET(self):
         common_setup()
-        print "stop"
         global application
         application.stop()
-        return "s"
-    
+        return "stopped"
+
+class preferences:
+    def GET(self):
+        common_setup()
+        web.header('Content-Type', 'application/json')
+        result = {}
+        for s in settings_writable:
+            result[s] = controller.settings[s]
+        return json.dumps(result)
+
+class save_preferences:
+    def POST(self):
+        global controller
+        common_setup()
+        web.header('Content-Type', 'application/json')
+        try:
+            data = json.loads(web.data())
+            for s in settings_writable:
+                controller.settings[s] = data[s]
+            controller.reload()
+            return '"OK"'
+        except Exception, e:
+            return json.dumps(unicode(e))
+
 controller = None
 application = None
 
@@ -129,6 +151,8 @@ def run():
         '/resume_tasks', 'resume_tasks',
         '/remove_tasks', 'remove_tasks',
         '/stop_server', 'stop_server',
+        '/preferences', 'preferences',
+        '/save_preferences', 'save_preferences',
         )
     global application
     application = web.application(urls, globals(), autoreload=False)

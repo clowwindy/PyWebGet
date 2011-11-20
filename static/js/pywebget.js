@@ -10,6 +10,7 @@ var strings = {
 };
 var _s = strings;
 var data = {tasks:[]};
+var settings = {};
 var columns = [
     { "mDataProp": "checkbox" },
     { "mDataProp": "status" },
@@ -62,6 +63,15 @@ function init_table() {
         ],
         "aoColumns": columns
     });
+}
+
+function reload_preferences(){
+    $.ajax('/preferences', {
+        dataType:"json",
+        success:function(data) {
+            window.settings = data;
+        }
+    })
 }
 
 function reload_data() {
@@ -209,10 +219,11 @@ function reload_table() {
 $(function() {
     init_table();
     reload_data();
+    reload_preferences();
     $(".button").button();
     set_table_size();
     $("#add").click(function() {
-        $("#add_task").dialog({
+        $("#add_task_dialog").dialog({
             title: _s["Add Task"],
             modal:true,
             minHeight:286,
@@ -226,7 +237,7 @@ $(function() {
                 }
             }
         });
-        $("#add_task").dialog({
+        $("#add_task_dialog").dialog({
             resize: function(event, ui) {
                 //TODO: resize textarea
             }
@@ -235,6 +246,7 @@ $(function() {
     $("#pause").click(pause_tasks);
     $("#resume").click(resume_tasks);
     $("#remove").click(remove_tasks);
+    $("#preferences").click(show_preferences_dialog);
     setInterval(reload_data, RELOAD_INTERVAL);
 });
 
@@ -273,6 +285,56 @@ function add_task() {
         }
     });
 }
+
+function save_preferences(){
+    var data = {};
+    for(var i in settings) {
+        var e = $(document.getElementById(i))
+        if(e.hasClass('number')){
+            data[i] = +e.val();
+        }else{
+            data[i] = e.val();
+        }
+    }
+    $.ajax('/save_preferences', {
+        data: JSON.stringify(data),
+        type: "POST",
+        dataType: "json",
+        success: function(d) {
+            if (d != 'OK') {
+                alert(d);
+            } else {
+                reload_preferences();
+            }
+        }
+    });
+}
+
+function show_preferences_dialog() {
+    $("#preferences_dialog").dialog({
+        title: _s["Preferences"],
+        modal:true,
+        minHeight:286,
+        minWidth:390,
+        buttons: { "Ok": function() {
+            save_preferences();
+            $(this).dialog("close");
+        },
+            "Cancel": function() {
+                $(this).dialog("close");
+            }
+        }
+    });
+    $("#preferences_dialog").dialog({
+        resize: function(event, ui) {
+            //TODO: resize textarea
+        }
+    });
+    for(var i in settings) {
+        $(document.getElementById(i)).val(settings[i]);
+    }
+}
+
 function selected_ids() {
     var ids = [];
     $(".taskid_checkbox:checked").each(function() {
@@ -298,7 +360,9 @@ function perform_ajax_on_selection(url) {
 }
 
 function remove_tasks() {
-    perform_ajax_on_selection("/remove_tasks");
+    if(confirm('Are you sure to delete these tasks?')) {
+        perform_ajax_on_selection("/remove_tasks");
+    }
 }
 function resume_tasks() {
     perform_ajax_on_selection("/resume_tasks");

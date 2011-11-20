@@ -24,10 +24,10 @@ body {
 #download_list_table td {
     font-family: Tahoma, Arial,Helvetica,sans-serif;
 }
-#add_task .text{
+.dialog .text{
     width:100%;
 }
-#add_task textarea {
+.dialog textarea {
     height: 100px;
     padding: 0;
     resize: none;

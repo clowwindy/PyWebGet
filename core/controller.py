@@ -56,7 +56,7 @@ class Controller(object):
         try:
             ti = task.Task(a_task)
             self.tasks.append(ti)
-            ti.retry_count = self.settings.retry_count
+            ti.retry_limit = self.settings.retry_limit
             ti.download_path = self.settings.download_path
             ti.oncomplete = self._oncomplete
             ti.onerror = self._onerror
@@ -82,7 +82,11 @@ class Controller(object):
             self.status = STATUS_STOPPING
             setting.save_settings(self.settings)
         self.update_event.set()
-        
+
+    def reload(self):
+        #TODO: 更新具体的设置
+        self.update_event.set()
+
     def add_task(self, url, cookie="", referrer = ""):
         import re
         if re.match(r"[^:]+://[^/]+/?([^?#]*)",url):

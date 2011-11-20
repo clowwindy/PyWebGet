@@ -4,6 +4,7 @@ __author__ = 'clowwindy'
 import threading
 import signal, os
 from core.controller import Controller
+import core.utils
 
 def sig_handler(signum, frame):
     from core.utils import log
@@ -29,5 +30,7 @@ controller_thread.start()
 
 import webui.app
 webui.app.set_controller(controller)
+
+core.utils.log("started")
 
 webui.app.run()
