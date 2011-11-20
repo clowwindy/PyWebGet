@@ -8,17 +8,29 @@ import utils
 import json
 import re
 import base64
+from core.setting import hash_password
 
 def common_setup():
     web.header('Server', "%s/%s" % (version.APP_NAME, version.VERSION))
     # for quick shutdown
     web.header('Connection', "Close")
     global controller
-    if controller.settings.need_login:
-        if web.ctx.env.get('HTTP_AUTHORIZATION') is not None:
-            return 'This is the index page'
+    if controller.settings.auth_enabled:
+        auth = web.ctx.env.get('HTTP_AUTHORIZATION')
+        authreq = False
+        if auth is None:
+            authreq = True
         else:
-            raise web.seeother('/login')
+            auth = re.sub('^Basic ', '', auth)
+            username, password = base64.decodestring(auth).split(':')
+            if username == controller.settings.auth_username and hash_password(password) == controller.settings.auth_password:
+                return
+            else:
+                authreq = True
+        if authreq:
+            web.header('WWW-Authenticate', 'Basic realm="PyWebGet"')
+            web.ctx.status = '401 Unauthorized'
+            raise web.Unauthorized()
 
 class index:
     def GET(self):
@@ -96,25 +108,6 @@ class task_list:
         common_setup()
         return json.dumps({"tasks": tasks})
 
-class login:
-    def GET(self):
-        auth = web.ctx.env.get('HTTP_AUTHORIZATION')
-        authreq = False
-        if auth is None:
-            authreq = True
-        else:
-            auth = re.sub('^Basic ', '', auth)
-            username, password = base64.decodestring(auth).split(':')
-            global controller
-            if username == controller.settings.username and password == controller.settings.password:
-                raise web.seeother('/')
-            else:
-                authreq = True
-        if authreq:
-            web.header('WWW-Authenticate', 'Basic realm="PyWebGet"')
-            web.ctx.status = '401 Unauthorized'
-            return "401 Unauthorized"
-
 class stop_server:
     def GET(self):
         common_setup()
@@ -139,7 +132,6 @@ def run():
         '/pause_tasks', 'pause_tasks',
         '/resume_tasks', 'resume_tasks',
         '/remove_tasks', 'remove_tasks',
-        '/login', 'login',
         '/stop_server', 'stop_server',
         )
     global application
