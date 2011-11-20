@@ -21,6 +21,9 @@ body {
     padding-left: 10px;
     padding-right: 10px;
 }
+#download_list_table td {
+    font-family: Tahoma, Arial,Helvetica,sans-serif;
+}
 #add_task .text{
     width:100%;
 }
