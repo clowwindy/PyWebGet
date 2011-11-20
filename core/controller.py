@@ -4,6 +4,7 @@ __author__ = 'clowwindy'
 
 import web, task, threading, types, time, urllib
 from utils import log
+import setting
 DB_NAME = 'db.sqlite3.db'
 DB_TYPE = 'sqlite'
 
@@ -19,6 +20,10 @@ class Controller(object):
     lock = threading.Lock()
     update_event = threading.Event()
     status = STATUS_RUNNING
+
+    def __init__(self):
+        self.settings = setting.load_settings()
+        self.thread_limit = self.settings.thread_limit
 
     def init(self):
         #第一次启动时运行，将所有downloading修改为inqueue
@@ -51,6 +56,8 @@ class Controller(object):
         try:
             ti = task.Task(a_task)
             self.tasks.append(ti)
+            ti.retry_count = self.settings.retry_count
+            ti.download_path = self.settings.download_path
             ti.oncomplete = self._oncomplete
             ti.onerror = self._onerror
             ti.onupdating_total_size = self._onupdating_total_size
@@ -73,6 +80,7 @@ class Controller(object):
     def stop(self):
         self.status = STATUS_STOPPING
         self.update_event.set()
+        setting.save_settings(self.settings)
         
     def add_task(self, url, cookie="", referrer = ""):
         import re
