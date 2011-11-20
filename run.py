@@ -6,7 +6,8 @@ import signal, os
 from core.controller import Controller
 
 def sig_handler(signum, frame):
-    print "exiting"
+    from core.utils import log
+    log("exiting")
     global controller
     controller.stop()
     webui.app.stop()
