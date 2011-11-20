@@ -13,10 +13,12 @@ def common_setup():
     web.header('Server', "%s/%s" % (version.APP_NAME, version.VERSION))
     # for quick shutdown
     web.header('Connection', "Close")
-    if web.ctx.env.get('HTTP_AUTHORIZATION') is not None:
-        return 'This is the index page'
-    else:
-        raise web.seeother('/login')
+    global controller
+    if controller.settings.need_login:
+        if web.ctx.env.get('HTTP_AUTHORIZATION') is not None:
+            return 'This is the index page'
+        else:
+            raise web.seeother('/login')
 
 class index:
     def GET(self):
@@ -94,10 +96,6 @@ class task_list:
         common_setup()
         return json.dumps({"tasks": tasks})
 
-allowed = (
-    ('pywebget','password'),
-)
-
 class login:
     def GET(self):
         auth = web.ctx.env.get('HTTP_AUTHORIZATION')
@@ -107,7 +105,8 @@ class login:
         else:
             auth = re.sub('^Basic ', '', auth)
             username, password = base64.decodestring(auth).split(':')
-            if (username, password) in allowed:
+            global controller
+            if username == controller.settings.username and password == controller.settings.password:
                 raise web.seeother('/')
             else:
                 authreq = True

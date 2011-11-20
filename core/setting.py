@@ -10,6 +10,9 @@ defaults = Storage({
     "buf_size" : 256 * 1024,
     "thread_limit": 2,
     "retry_count":10,
+    "need_login":True,
+    "username":"pywebget",
+    "password":"123456",
 })
 
 
