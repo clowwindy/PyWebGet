@@ -11,6 +11,8 @@ import base64
 
 def common_setup():
     web.header('Server', "%s/%s" % (version.APP_NAME, version.VERSION))
+    # for quick shutdown
+    web.header('Connection', "Close")
     if web.ctx.env.get('HTTP_AUTHORIZATION') is not None:
         return 'This is the index page'
     else:

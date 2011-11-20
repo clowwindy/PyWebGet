@@ -78,9 +78,10 @@ class Controller(object):
             self.update_event.wait(CHECK_INTERVAL)
 
     def stop(self):
-        self.status = STATUS_STOPPING
+        if self.status == STATUS_RUNNING:
+            self.status = STATUS_STOPPING
+            setting.save_settings(self.settings)
         self.update_event.set()
-        setting.save_settings(self.settings)
         
     def add_task(self, url, cookie="", referrer = ""):
         import re

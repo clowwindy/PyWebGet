@@ -6,10 +6,11 @@ import signal, os
 from core.controller import Controller
 
 def sig_handler(signum, frame):
+    print "exiting"
     global controller
     controller.stop()
-    import sys
-    sys.exit()
+    webui.app.stop()
+
 
 if os.name == 'posix':
     signal.signal(signal.SIGABRT, sig_handler)
