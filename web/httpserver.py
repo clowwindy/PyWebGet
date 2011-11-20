@@ -9,6 +9,8 @@ import webapi as web
 import net
 import utils
 
+server = None
+
 def runbasic(func, server_address=("0.0.0.0", 8080)):
     """
     Runs a simple HTTP server hosting WSGI app `func`. The directory `static/` 
@@ -140,7 +142,8 @@ def runsimple(func, server_address=("0.0.0.0", 8080)):
     """
     func = StaticMiddleware(func)
     func = LogMiddleware(func)
-    
+
+    global server
     server = WSGIServer(server_address, func)
 
     if server.ssl_adapter:

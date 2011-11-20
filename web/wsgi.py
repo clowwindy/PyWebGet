@@ -10,7 +10,8 @@ import webapi as web
 from utils import listget
 from net import validaddr, validip
 import httpserver
-    
+
+
 def runfcgi(func, addr=('localhost', 8000)):
     """Runs a WSGI function as a FastCGI server."""
     import flup.server.fcgi as flups

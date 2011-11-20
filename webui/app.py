@@ -114,7 +114,16 @@ class login:
             web.ctx.status = '401 Unauthorized'
             return "401 Unauthorized"
 
+class stop_server:
+    def GET(self):
+        common_setup()
+        print "stop"
+        global application
+        application.stop()
+        return "s"
+    
 controller = None
+application = None
 
 def set_controller(c):
     global controller
@@ -130,7 +139,12 @@ def run():
         '/resume_tasks', 'resume_tasks',
         '/remove_tasks', 'remove_tasks',
         '/login', 'login',
+        '/stop_server', 'stop_server',
         )
+    global application
+    application = web.application(urls, globals(), autoreload=False)
+    application.run()
 
-    my_app = web.application(urls, globals(), autoreload=False)
-    my_app.run()
+def stop():
+    global application
+    application.stop()

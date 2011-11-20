@@ -309,6 +309,9 @@ class application:
         function.
         """
         return wsgi.runwsgi(self.wsgifunc(*middleware))
+
+    def stop(self):
+        wsgi.httpserver.server.stop()
     
     def cgirun(self, *middleware):
         """

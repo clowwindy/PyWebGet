@@ -2,15 +2,23 @@ __author__ = 'clowwindy'
 
 
 import threading
+import signal, os
 from core.controller import Controller
 
+def sig_handler(signum, frame):
+    global controller
+    controller.stop()
+    import sys
+    sys.exit()
 
-#db = web.database(dbn='sqlite', db='db.sqlite3.db')
-##db.insert('Task', url="http://mplayerx.googlecode.com/files/MPlayerX_1.0.9.zip")
-#
-#tasks = db.select('Task',where="id=1")
-#taskinfo = TaskInfo(tasks[0])
-#taskinfo.download()
+if os.name == 'posix':
+    signal.signal(signal.SIGABRT, sig_handler)
+    signal.signal(signal.SIGTERM, sig_handler)
+    signal.signal(signal.SIGINT, sig_handler)
+elif os.name == 'nt':
+    signal.signal(signal.SIGABRT, sig_handler)
+    signal.signal(signal.SIGTERM, sig_handler)
+    signal.signal(signal.SIGINT, sig_handler)
 
 controller = Controller()
 controller.init()
