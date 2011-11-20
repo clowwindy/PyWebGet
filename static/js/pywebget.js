@@ -18,6 +18,7 @@ var columns = [
     { "mDataProp": "total_size" },
     { "mDataProp": "percent" },
     { "mDataProp": "speed" },
+    { "mDataProp": "eta" },
     { "mDataProp": "completed_size" },
     { "mDataProp": "date_created" },
     { "mDataProp": "date_completed" }
@@ -114,7 +115,7 @@ function find_table_row_by_id(id) {
 
 function render_row(row) {
     // calculate speed
-    var speed = 0, speed_str = "";
+    var speed = 0, speed_str = "", eta = 0;
     if (row.status == STATUS_DOWNLOADING && window.old_data) {
         var cur_date = new Date();
         var interval = RELOAD_INTERVAL;
@@ -127,7 +128,8 @@ function render_row(row) {
             if (old_row.id == row.id) {
                 var dif = row.completed_size - old_row.completed_size;
                 speed = Math.max(Math.floor(dif / interval * 1000), 0);
-                if (speed) {
+                eta = (row.total_size - row.completed_size) / speed * 1000;
+                if (speed > 0 && speed != Infinity) {
                     speed_str = readablize_bytes(speed) + "/s";
                 } else {
                     speed_str = "";
@@ -136,8 +138,9 @@ function render_row(row) {
             }
         }
     }
+    eta = time_span_str(eta);
     var percent = Math.floor(row.completed_size / row.total_size * 100);
-    if (percent) {
+    if (row.completed_size > 0 && percent >= 0 && percent != Infinity) {
         percent += "%";
     } else {
         percent = "";
@@ -146,14 +149,15 @@ function render_row(row) {
         id:row.id,
         checkbox:"<input type='checkbox' class='taskid_checkbox' taskid='" + row.id + "' />",
         status:str_by_status(row.status),
-        filename:row.filename,
-        dir:row.dir,
+        filename:html_encode(row.filename),
+        dir:html_encode(row.dir),
         total_size:readablize_bytes(row.total_size),
         percent:percent,
         completed_size:readablize_bytes(row.completed_size),
         date_created:timestamp_repr(row.date_created),
         date_completed:timestamp_repr(row.date_completed),
-        speed:speed_str
+        speed:speed_str,
+        eta:eta
     };
 }
 
@@ -196,6 +200,7 @@ function reload_table() {
         oTable.fnUpdate(rendered_row.percent, index, get_col_index_by_name('percent'), false, false);
         oTable.fnUpdate(rendered_row.date_completed, index, get_col_index_by_name('date_completed'), false, false);
         oTable.fnUpdate(rendered_row.speed, index, get_col_index_by_name('speed'), false, false);
+        oTable.fnUpdate(rendered_row.eta, index, get_col_index_by_name('eta'), false, false);
     });
     // optimize by redrawing table only once
     if(!all_same) oTable.fnDraw();

@@ -15,3 +15,28 @@ function timestamp_repr(t) {
     var d = new Date(t * 1000);
     return d.toString('yyyy-MM-dd HH:mm:ss');
 }
+
+function html_encode(value) {
+    if(value == null){
+        value="";
+    }
+    return $('<div/>').text(value).html();
+}
+
+function time_span_str(milliseconds) {
+    if(milliseconds > 0 && milliseconds < Infinity) {
+        var ts = new TimeSpan(milliseconds);
+        var result = "";
+        var start = false;
+        var attrs = ['days','hours','minutes','seconds'];
+        var display_names = ['d','h','min','s'];
+        for(var a in attrs){
+            if(ts[attrs[a]] > 0 || start) {
+                start = true;
+                result += " " + ts[attrs[a]] + display_names[a];
+            }
+        }
+        return result;
+    }
+    return "";
+}
