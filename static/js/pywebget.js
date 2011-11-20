@@ -68,6 +68,7 @@ function init_table() {
 function reload_preferences(){
     $.ajax('/preferences', {
         dataType:"json",
+        cache:false,
         success:function(data) {
             window.settings = data;
         }
@@ -77,6 +78,7 @@ function reload_preferences(){
 function reload_data() {
     $.ajax('/task_list', {
         dataType:"json",
+        cache:false,
         success:function(data) {
             window.old_data = window.data;
             window.data = data;
@@ -126,6 +128,7 @@ function find_table_row_by_id(id) {
 function render_row(row) {
     // calculate speed
     var speed = 0, speed_str = "", eta = 0;
+    var progress_html = '<progress value="p_value" max="100" title="p_value%">p_value%</progress>';
     if (row.status == STATUS_DOWNLOADING && window.old_data) {
         var cur_date = new Date();
         var interval = RELOAD_INTERVAL;
@@ -151,9 +154,9 @@ function render_row(row) {
     eta = time_span_str(eta);
     var percent = Math.floor(row.completed_size / row.total_size * 100);
     if (row.completed_size > 0 && percent >= 0 && percent != Infinity) {
-        percent += "%";
+        percent = progress_html.replace(/p_value/g, percent.toString());
     } else {
-        percent = "";
+        percent = '<progress></progress>';
     }
     return {
         id:row.id,
@@ -276,6 +279,7 @@ function add_task() {
         data: data,
         type: "POST",
         dataType: "json",
+        cache:false,
         success: function(d) {
             if (d != 'OK') {
                 alert(d);
@@ -300,6 +304,7 @@ function save_preferences(){
         data: JSON.stringify(data),
         type: "POST",
         dataType: "json",
+        cache:false,
         success: function(d) {
             if (d != 'OK') {
                 alert(d);
@@ -349,6 +354,7 @@ function perform_ajax_on_selection(url) {
         data: data,
         type: "POST",
         dataType: "json",
+        cache:false,
         success: function(d) {
             if (d != 'OK') {
                 alert(d);

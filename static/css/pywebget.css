@@ -48,3 +48,6 @@ td {
 input, textarea, select {
     outline: none;
 }
+#download_list_table progress {
+ width: 83px;
+}
