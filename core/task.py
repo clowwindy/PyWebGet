@@ -88,7 +88,6 @@ class Task(object):
             while data and self.task.status == STATUS_DOWNLOADING:
                 self.task.completed_size += len(data)
                 f.write(data)
-                f.flush()
                 data = netfile.read(CHUNK_SIZE)
             f.flush()
 
