@@ -40,3 +40,39 @@ function time_span_str(milliseconds) {
     }
     return "";
 }
+
+$.alert=function(msg, title, callback){
+    $("#confirm-message").text(msg);
+    $("#dialog-alert").dialog({
+        title: title,
+        modal:true,
+        show: dialog_effect,
+        hide: dialog_effect,
+        resizable: false,
+        buttons: { "Ok": function() {
+                if(callback)callback();
+                $(this).dialog("close");
+            }
+        }
+    });
+};
+
+$.confirm=function(msg, title, ok_callback, cancel_callback){
+    $("#confirm-message").text(msg);
+    $("#dialog-alert").dialog({
+        title: title,
+        modal:true,
+        show: dialog_effect,
+        hide: dialog_effect,
+        resizable: false,
+        buttons: { "Ok": function() {
+                if(ok_callback)ok_callback();
+                $(this).dialog("close");
+            },
+            "Cancel": function() {
+                if(cancel_callback)cancel_callback();
+                $(this).dialog("close");
+            }
+        }
+    });
+};

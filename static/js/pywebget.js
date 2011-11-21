@@ -222,9 +222,11 @@ function reload_table() {
 
     // select checkbox by click rows
     $("#download_list_table tr td").unbind();
-    $("#download_list_table tr td").click(function(){
-        var checkbox = $(this).parent().find(":checkbox");
-        checkbox.prop('checked', !checkbox[0].checked);
+    $("#download_list_table tr td").click(function(e){
+        if(e.target == this){
+            var checkbox = $(this).parent().find(":checkbox");
+            checkbox.prop('checked', !checkbox[0].checked);
+        }
     });
 }
 
@@ -293,7 +295,7 @@ function add_task() {
         cache:false,
         success: function(d) {
             if (d != 'OK') {
-                alert(d);
+                $.alert(d);
             } else {
                 reload_data();
             }
@@ -318,7 +320,7 @@ function save_preferences(){
         cache:false,
         success: function(d) {
             if (d != 'OK') {
-                alert(d);
+                $.alert(d);
             } else {
                 reload_preferences();
             }
@@ -370,7 +372,7 @@ function perform_ajax_on_selection(url) {
         cache:false,
         success: function(d) {
             if (d != 'OK') {
-                alert(d);
+                $.alert(d);
             } else {
                 reload_data();
             }
@@ -381,9 +383,12 @@ function perform_ajax_on_selection(url) {
 function remove_tasks() {
     var num = selected_ids().length;
     if(num > 0) {
-        if(confirm('Would you like to delete these _num tasks?'.replace("_num", num))) {
+        $.confirm('Would you like to delete these _num tasks?'.replace("_num", num), "", function(){
             perform_ajax_on_selection("/remove_tasks");
-        }
+        },null);
+//        if(confirm()) {
+//            perform_ajax_on_selection("/remove_tasks");
+//        }
     }
 }
 function resume_tasks() {
