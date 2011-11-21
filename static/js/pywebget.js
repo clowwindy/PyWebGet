@@ -6,11 +6,13 @@ var STATUS_PAUSED = 2;
 var STATUS_COMPLETED = 3;
 
 var strings = {
-    "Add Task":"Add Task"
+    "Add Task":"Add Task",
+    "Preferences":"Preferences"
 };
 var _s = strings;
 var data = {tasks:[]};
 var settings = {};
+var dialog_effect = {effect:'drop', direction: "up" };
 var columns = [
     { "mDataProp": "checkbox" },
     { "mDataProp": "status" },
@@ -217,6 +219,13 @@ function reload_table() {
     });
     // optimize by redrawing table only once
     if(!all_same) oTable.fnDraw();
+
+    // select checkbox by click rows
+    $("#download_list_table tr td").unbind();
+    $("#download_list_table tr td").click(function(){
+        var checkbox = $(this).parent().find(":checkbox");
+        checkbox.prop('checked', !checkbox[0].checked);
+    });
 }
 
 $(function() {
@@ -231,6 +240,8 @@ $(function() {
             modal:true,
             minHeight:286,
             minWidth:390,
+            show: dialog_effect,
+            hide: dialog_effect,
             buttons: { "Ok": function() {
                 add_task();
                 $(this).dialog("close");
@@ -321,6 +332,8 @@ function show_preferences_dialog() {
         modal:true,
         minHeight:286,
         minWidth:390,
+        show: dialog_effect,
+        hide: dialog_effect,
         buttons: { "Ok": function() {
             save_preferences();
             $(this).dialog("close");
@@ -366,8 +379,11 @@ function perform_ajax_on_selection(url) {
 }
 
 function remove_tasks() {
-    if(confirm('Are you sure to delete these tasks?')) {
-        perform_ajax_on_selection("/remove_tasks");
+    var num = selected_ids().length;
+    if(num > 0) {
+        if(confirm('Would you like to delete these _num tasks?'.replace("_num", num))) {
+            perform_ajax_on_selection("/remove_tasks");
+        }
     }
 }
 function resume_tasks() {

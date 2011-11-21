@@ -1,53 +1,102 @@
 body {
     margin: 0;
     padding: 0;
-	font: 12px "Lucida Grande",Verdana,Arial,Helvetica,sans-serif;
+    font: 12px "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
     overflow: hidden;
 }
+
 #toolbar {
     padding: 10px;
 }
+
 .toolbar_icon {
     height: 26px;
     width: 26px;
     vertical-align: middle;
 }
-.text,#download_list_table_filter input {
-    border: 1px solid #aaaaaa;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) inset;
+
+.button .toolbar_icon {
+    opacity: 0.8;
+    -moz-transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
 }
+.button:hover .toolbar_icon {
+    opacity: 1;
+    -webkit-transition: all 0.10s;
+    -moz-transition: all 0.10s;
+    transition: all 0.10s;
+}
+.button[disabled] .toolbar_icon {
+    opacity: 0.4 !important;
+}
+/* button animation properties */
+.ui-button {
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+    transition: all 0.5s;
+}
+/*.text, #download_list_table_filter input {*/
+    /*border: 1px solid #aaaaaa;*/
+    /*box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) inset;*/
+/*}*/
+
 #download_list_table_filter input {
     border-radius: 10px 10px 10px 10px;
     padding-left: 10px;
     padding-right: 10px;
 }
+
 #download_list_table td {
-    font-family: Tahoma, Arial,Helvetica,sans-serif;
+    font-family: Tahoma, Arial, Helvetica, sans-serif;
 }
-.dialog .text{
-    width:100%;
+#download_list_table tr:hover td {
+    background: #eaF0F4;
 }
+.dialog {
+    height: 2em;
+}
+
+.dialog .text {
+    width: 100%;
+}
+
 .dialog textarea {
     height: 100px;
-    padding: 0;
+    /*padding: 0;*/
     resize: none;
 }
+
 .ui-dialog {
     border-radius: 7px;
-    box-shadow:  0 10px 30px rgba(0, 0, 0, 0.33);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.33);
 }
 
 .ui-button {
-     box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s;
+    -moz-transition: all 0.3s;
 }
 
 td {
-    word-wrap:break-word;
-    word-break:break-all;
+    word-wrap: break-word;
+    word-break: break-all;
 }
+
 input, textarea, select {
     outline: none;
 }
+
 #download_list_table progress {
- width: 83px;
+    width: 83px;
+}
+
+/* fix webkit corner bugs */
+.ui-dialog-buttonpane {
+    -webkit-border-bottom-left-radius: 7px !important;
+    -webkit-border-bottom-right-radius: 7px !important;
+}
+.ui-dialog-titlebar {
+    -webkit-border-top-left-radius: 7px !important;
+    -webkit-border-top-right-radius: 7px !important;
 }
