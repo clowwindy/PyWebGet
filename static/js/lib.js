@@ -42,7 +42,7 @@ function time_span_str(milliseconds) {
 }
 
 $.alert=function(msg, title, callback){
-    $("#confirm-message").text(msg);
+    $("#alert-message").text(msg);
     $("#dialog-alert").dialog({
         title: title,
         modal:true,
@@ -58,7 +58,7 @@ $.alert=function(msg, title, callback){
 };
 
 $.confirm=function(msg, title, ok_callback, cancel_callback){
-    $("#confirm-message").text(msg);
+    $("#alert-message").text(msg);
     $("#dialog-alert").dialog({
         title: title,
         modal:true,

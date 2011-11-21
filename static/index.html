@@ -19,9 +19,9 @@
 <body class="ui-form">
 <div id="toolbar" class="fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix">
     <button id="add" title="Add" class="button"><img class="toolbar_icon" src="img/icons/plus.png"/></button>
-    <button id="pause" title="Pause" class="button"><img class="toolbar_icon" src="img/icons/pause.png"/></button>
-    <button id="resume" title="Resume" class="button"><img class="toolbar_icon" src="img/icons/play.png"/></button>
-    <button id="remove" title="Delete" class="button"><img class="toolbar_icon" src="img/icons/trash.png"/></button>
+    <button id="pause" title="Pause" class="button" disabled="true"><img class="toolbar_icon" src="img/icons/pause.png"/></button>
+    <button id="resume" title="Resume" class="button" disabled="true"><img class="toolbar_icon" src="img/icons/play.png"/></button>
+    <button id="remove" title="Delete" class="button" disabled="true"><img class="toolbar_icon" src="img/icons/trash.png"/></button>
     <button id="preferences" title="Delete" class="button"><img class="toolbar_icon" src="img/icons/preferences.png"/></button>
 </div>
 <div id="download_list_wrapper">
@@ -49,15 +49,15 @@
     <table style="width:100%">
         <tr>
             <td style="width:55px">URL(s)</td>
-            <td><textarea id="urls" class="text"></textarea></td>
+            <td><textarea id="urls" class="text required" placeholder="Required"></textarea></td>
         </tr>
         <tr>
             <td>Cookie</td>
-            <td><input id="cookie" type="text" class="text"/></td>
+            <td><input id="cookie" type="text" class="text" placeholder="Optional" /></td>
         </tr>
         <tr>
             <td>Referrer</td>
-            <td><input id="referrer" type="text" class="text"/></td>
+            <td><input id="referrer" type="text" class="text" placeholder="Optional" /></td>
         </tr>
     </table>
 </div>
@@ -81,8 +81,8 @@
         </tr>
     </table>
 </div>
-<div id="dialog-alert" title="Confirm">
-	<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><span id="confirm-message"></span></p>
+<div id="dialog-alert" style="display:none">
+	<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><span id="alert-message"></span></p>
 </div>
 </body>
 </html>

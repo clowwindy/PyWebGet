@@ -88,11 +88,13 @@ class remove_tasks:
         except Exception, e:
             return json.dumps(unicode(e))
 
+def _get_task_list():
+    global controller
+    tasks = controller.task_list()
+    return tasks
 
 class task_list:
     def GET(self):
-        global controller
-        tasks = controller.task_list()
 #        for a_task in tasks:
         #            a_task.status = task.str_by_status(a_task.status)
         #            a_task.checkbox = "<input type='checkbox' id='task_%d' />" % a_task.id
@@ -102,7 +104,7 @@ class task_list:
 
         web.header('Content-Type', 'application/json')
         common_setup()
-        return json.dumps({"tasks": tasks})
+        return json.dumps( _get_task_list())
 
 class stop_server:
     def GET(self):
@@ -111,14 +113,18 @@ class stop_server:
         application.stop()
         return "stopped"
 
+def _get_preferences():
+    global controller
+    result = {}
+    for s in settings_writable:
+        result[s] = controller.settings[s]
+    return result
+
 class preferences:
     def GET(self):
         common_setup()
         web.header('Content-Type', 'application/json')
-        result = {}
-        for s in settings_writable:
-            result[s] = controller.settings[s]
-        return json.dumps(result)
+        return json.dumps(_get_preferences())
 
 class save_preferences:
     def POST(self):
@@ -133,6 +139,13 @@ class save_preferences:
             return '"OK"'
         except Exception, e:
             return json.dumps(unicode(e))
+
+class all_data:
+    def GET(self):
+        common_setup()
+        web.header('Content-Type', 'application/json')
+        return json.dumps({'tasks':_get_task_list(),
+                           'preferences':_get_preferences()})
 
 controller = None
 application = None
@@ -153,6 +166,7 @@ def run():
         '/stop_server', 'stop_server',
         '/preferences', 'preferences',
         '/save_preferences', 'save_preferences',
+        '/all_data', 'all_data',
         )
     global application
     application = web.application(urls, globals(), autoreload=False)

@@ -471,7 +471,7 @@ button.ui-button-icons-only { width: 3.7em; }
 	-webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.15), 0 1px 0 rgba(255,255,255,0.8) inset;
 	box-shadow: 0 0 8px rgba(0, 0, 0, 0.15), 0 1px 0 rgba(255,255,255,0.8) inset;
 }
-.ui-button.ui-state-focus {
+.ui-button.ui-state-active {
 	outline: none;
 	color: #1c4257;
 	border-color: #7096ab;

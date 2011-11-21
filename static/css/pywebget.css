@@ -27,9 +27,12 @@ body {
     -moz-transition: opacity 0.10s;
     transition: opacity 0.10s;
 }
-.button[disabled] .toolbar_icon {
-    opacity: 0.4 !important;
+.ui-state-disabled:hover .toolbar_icon{
+    opacity: 0.8;
 }
+/*.button[disabled] .toolbar_icon {*/
+    /*opacity: 0.4 !important;*/
+/*}*/
 /* button animation properties */
 /*.ui-button {*/
     /*-webkit-transition: -webkit-box-shadow,border-color 0.5s ease-in-out;*/

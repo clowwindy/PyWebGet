@@ -10,7 +10,7 @@ var strings = {
     "Preferences":"Preferences"
 };
 var _s = strings;
-var data = {tasks:[]};
+var data = [];
 var settings = {};
 var dialog_effect = {effect:'drop', direction: "up" };
 var columns = [
@@ -89,6 +89,19 @@ function reload_data() {
     })
 }
 
+function reload_all() {
+    $.ajax('/all_data', {
+        dataType:"json",
+        cache:false,
+        success:function(data) {
+            window.old_data = window.data;
+            window.data = data.tasks;
+            window.settings = data.preferences;
+            reload_table();
+        }
+    })
+}
+
 function callback_on_complement(array1, array2, callback) {
     // find what does array1 have but array2 haven't
     outer:
@@ -138,8 +151,8 @@ function render_row(row) {
             interval = cur_date - window.last_check_date;
             window.last_check_date = cur_date;
         }
-        for (var i in old_data.tasks) {
-            var old_row = old_data.tasks[i];
+        for (var i in old_data) {
+            var old_row = old_data[i];
             if (old_row.id == row.id) {
                 var dif = row.completed_size - old_row.completed_size;
                 speed = Math.max(Math.floor(dif / interval * 1000), 0);
@@ -186,17 +199,19 @@ function get_col_index_by_name(name) {
 }
 
 function reload_table() {
+    var all_same = true;
     //和旧数据对比，看看哪些少了，删除
-    callback_on_complement(old_data.tasks, data.tasks, function(id) {
+    callback_on_complement(old_data, data, function(id) {
         oTable.fnDeleteRow(find_table_row_by_id(id));
+        all_same = false;
     });
     //看看哪些多了，増行
-    callback_on_complement(data.tasks, old_data.tasks, function(id, row) {
+    callback_on_complement(data, old_data, function(id, row) {
         oTable.fnAddData(render_row(row));
+        all_same = false;
     });
     //更新相同的数据对应的行里的状态、下载进度、速度信息
-    var all_same = true;
-    callback_on_intersection(data.tasks, old_data.tasks, function(id, row, row2) {
+    callback_on_intersection(data, old_data, function(id, row, row2) {
         // optimize by updating rows changed only
         var same = true;
         for (var i in row) {
@@ -218,22 +233,26 @@ function reload_table() {
         oTable.fnUpdate(rendered_row.eta, index, get_col_index_by_name('eta'), false, false);
     });
     // optimize by redrawing table only once
-    if(!all_same) oTable.fnDraw();
-
-    // select checkbox by click rows
-    $("#download_list_table tr td").unbind();
-    $("#download_list_table tr td").click(function(e){
-        if(e.target == this){
-            var checkbox = $(this).parent().find(":checkbox");
-            checkbox.prop('checked', !checkbox[0].checked);
-        }
-    });
+    if(!all_same){
+        oTable.fnDraw();
+        // select checkbox by click rows
+        $("#download_list_table tr td").unbind().click(function(e){
+            if(e.target == this){
+                var checkbox = $(this).parent().find(":checkbox");
+                checkbox.prop('checked', !checkbox[0].checked);
+            }
+            update_button_state();
+        });
+        $(":checkbox").unbind().change(update_button_state);
+        update_button_state();
+    }
 }
 
 $(function() {
     init_table();
-    reload_data();
-    reload_preferences();
+//    reload_data();
+//    reload_preferences();
+    reload_all();
     $(".button").button();
     set_table_size();
     $("#add").click(function() {
@@ -265,6 +284,14 @@ $(function() {
     $("#preferences").click(show_preferences_dialog);
     setInterval(reload_data, RELOAD_INTERVAL);
 });
+
+function update_button_state() {
+    if(selected_ids().length > 0){
+        $("#pause, #resume, #remove").attr("disabled", null).button("refresh");
+    } else {
+        $("#pause, #resume, #remove").attr("disabled", true).button("refresh");
+    }
+}
 
 function set_table_size() {
     var table_body_height = window.innerHeight - ($("#toolbar").outerHeight() +
