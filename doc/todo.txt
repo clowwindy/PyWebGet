@@ -168,4 +168,6 @@ milestone：
 		安装脚本
 		debian启动脚本
 		打包成deb
-		
+
+	bug修正：
+	    按数值排序
