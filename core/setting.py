@@ -1,6 +1,10 @@
 __author__ = 'clowwindy'
 
-import codecs, json
+import codecs
+try:
+    import json
+except ImportError:
+    import simplejson as json
 from web.utils import Storage
 
 SETTING_FILE = "settings.json"

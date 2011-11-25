@@ -3,7 +3,10 @@
 __author__ = 'clowwindy'
 import web
 from core import task, version
-import json
+try:
+    import json
+except ImportError:
+    import simplejson as json
 import re
 import base64
 from core.setting import hash_password, settings_writable
@@ -100,7 +103,6 @@ class task_list:
         #            a_task.checkbox = "<input type='checkbox' id='task_%d' />" % a_task.id
         #            a_task.date_completed = utils.timestamp_repr(a_task.date_completed)
         #            a_task.date_created = utils.timestamp_repr(a_task.date_created)
-        import json
 
         web.header('Content-Type', 'application/json')
         common_setup()
