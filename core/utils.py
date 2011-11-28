@@ -1,4 +1,4 @@
-# _*_ coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 import time
 
 __author__ = 'clowwindy'
