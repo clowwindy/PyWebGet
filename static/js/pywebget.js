@@ -4,6 +4,7 @@ var STATUS_QUEUED = 0;
 var STATUS_DOWNLOADING = 1;
 var STATUS_PAUSED = 2;
 var STATUS_COMPLETED = 3;
+var STATUS_FAILED = 16;
 
 var strings = {
     "Add Task":"Add Task",
@@ -42,6 +43,8 @@ function str_by_status(status) {
         return "Paused";
     else if (status == STATUS_COMPLETED)
         return "Completed";
+    else if (status == STATUS_FAILED)
+        return "Failed";
     else
         return "";
 }

@@ -10,10 +10,13 @@ DB_TYPE = 'sqlite'
 
 CHECK_INTERVAL = 300
 
+TASK_STOP_TIMEOUT = 5
+
 STATUS_RUNNING = 1
 STATUS_STOPPING = 2
 
 class Controller(object):
+    controller_thread = None
     threads = []
     tasks = []
     thread_limit = 2
@@ -43,7 +46,8 @@ class Controller(object):
                     break
                 a_task.status = task.STATUS_DOWNLOADING
                 self._update_task_status(db, task.STATUS_DOWNLOADING, a_task)
-                t = threading.Thread(target=self.run_task,args=(a_task,))
+                t = threading.Thread(target=self.run_task,args=(a_task,),name='task')
+#                t.setDaemon(True)
                 self.lock.acquire()
                 self.threads.append(t)
                 self.lock.release()
@@ -51,13 +55,18 @@ class Controller(object):
                 task_running += 1
 
     def run_task(self, a_task):
+        log("download thread started")
         thread = threading.currentThread()
         ti = None
         try:
             ti = task.Task(a_task)
             self.tasks.append(ti)
+            ti.thread = thread
             ti.retry_limit = self.settings.retry_limit
             ti.download_path = self.settings.download_path
+            ti.timeout = self.settings.timeout
+            ti.retry_limit = self.settings.retry_limit
+            ti.retry_interval = self.settings.retry_interval
             ti.oncomplete = self._oncomplete
             ti.onerror = self._onerror
             ti.onupdating_total_size = self._onupdating_total_size
@@ -69,19 +78,28 @@ class Controller(object):
                 self.tasks.remove(ti)
             self.threads.remove(thread)
             self.lock.release()
+            log("download thread stopped")
 
     def run(self):
+        self.controller_thread = threading.currentThread()
         self.status = STATUS_RUNNING
         while self.status == STATUS_RUNNING:
             self.update_tasks()
             self.update_event.clear()
             self.update_event.wait(CHECK_INTERVAL)
 
+        log('controller stopped')
+
     def stop(self):
+        log('controller stopping')
         if self.status == STATUS_RUNNING:
             self.status = STATUS_STOPPING
             setting.save_settings(self.settings)
+        for a_task in list(self.tasks):
+            log('pausing task ' + a_task.url)
+            self.pause_task(a_task, dontsave=True)
         self.update_event.set()
+        self.controller_thread.join()
 
     def reload(self):
         #TODO: 更新具体的设置
@@ -102,18 +120,21 @@ class Controller(object):
             log("add task: URL is not valid:: "+url)
             raise AssertionError("URL is not valid: " + url)
 
-    def pause_task(self, a_task):
+    def pause_task(self, a_task, dontsave=False):
         task_id = a_task
         if not type(a_task) is types.IntType:
             task_id = a_task.id
         db = self._db()
         status = self._get_task_status(db, task_id)
         if status == task.STATUS_DOWNLOADING or status == task.STATUS_QUEUED:
-            self._update_task_status(db, task.STATUS_PAUSED, task_id)
+            if not dontsave:
+                self._update_task_status(db, task.STATUS_PAUSED, task_id)
             for a_task_1 in self.tasks:
                 if task_id == a_task_1.id:
                     a_task_1.task.status = task.STATUS_PAUSED
+                    a_task_1.event.set()
                     db.update('Task', where="id = %d" % task_id, completed_size = "%d" % a_task_1.completed_size)
+                    a_task_1.thread.join(timeout=TASK_STOP_TIMEOUT)
                 
     def resume_task(self, a_task, set_update_event = True):
         task_id = a_task
@@ -121,7 +142,7 @@ class Controller(object):
             task_id = a_task.id
         db = self._db()
         status = self._get_task_status(db, task_id)
-        if status == task.STATUS_PAUSED:
+        if status == task.STATUS_PAUSED or status == task.STATUS_FAILED:
             self._update_task_status(db, task.STATUS_QUEUED, task_id)
             # 不改变内存中任务的状态，注释掉
 #            for a_task_1 in self.tasks:
@@ -145,6 +166,7 @@ class Controller(object):
         else:
             # 直接删除
             db.delete('Task',  where="id = %d" % task_id)
+            log("deleted: " + str(task_id))
     
     def pause_tasks(self, tasks):
         for a_task in tasks:
@@ -169,7 +191,6 @@ class Controller(object):
                 for a_task_2 in self.tasks:
                     if a_task.id == a_task_2.id:
                         a_task.completed_size = a_task_2.completed_size
-                        a_task.speed = a_task_2.speed
                         a_task.filename = a_task_2.filename
                         found = True
                         break
@@ -194,14 +215,17 @@ class Controller(object):
 
     def _onerror(self, a_task, error_code):
         db = self._db()
+        self._update_task_status(db, task.STATUS_FAILED, a_task)
         db.update('Task', where="id = %d" % a_task.id, completed_size = "%d" % a_task.completed_size, filename=a_task.filename)
         log("error %s: %s" % (error_code, a_task.url))
 
     def _onstatus_change(self, a_task):
         if a_task.status == task.STATUS_DELETED:
+            log("deleted: "+a_task.url)
             db = self._db()
             db.delete('Task',  where="id = %d" % a_task.id)
         else:
+            log("status changed: "+a_task.url + " " + str(a_task.status))
             db = self._db()
             db.update('Task', where="id = %d" % a_task.id, completed_size = "%d" % a_task.completed_size, filename=a_task.filename)
 
