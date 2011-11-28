@@ -49,7 +49,7 @@ $.alert=function(msg, title, callback){
         show: dialog_effect,
         hide: dialog_effect,
         resizable: false,
-        buttons: { "Ok": function() {
+        buttons: { "OK": function() {
                 if(callback)callback();
                 $(this).dialog("close");
             }
@@ -65,7 +65,7 @@ $.confirm=function(msg, title, ok_callback, cancel_callback){
         show: dialog_effect,
         hide: dialog_effect,
         resizable: false,
-        buttons: { "Ok": function() {
+        buttons: { "OK": function() {
                 if(ok_callback)ok_callback();
                 $(this).dialog("close");
             },
