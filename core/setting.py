@@ -43,7 +43,7 @@ def load_settings():
         setting = Storage(dict(list(defaults.items()) + list(setting.items())))
     except Exception:
         from utils import log
-        log('settings.json is corrupt, load default settings')
+        log('settings file is invalid, load default settings')
         setting = Storage(defaults)
     finally:
         if f:

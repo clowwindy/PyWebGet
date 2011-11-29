@@ -2,11 +2,14 @@
 
 __author__ = 'clowwindy'
 
-import web, task, threading, types, time, urllib
+import web, task, threading, types, time, urllib, os
 from utils import log
 import setting
-DB_NAME = 'db.sqlite3.db'
+
+DB_NAME = 'db.sqlite3'
 DB_TYPE = 'sqlite'
+
+EMPTY_DB = "../share/empty.db"
 
 CHECK_INTERVAL = 300
 
@@ -29,6 +32,14 @@ class Controller(object):
         self.thread_limit = self.settings.thread_limit
 
     def init(self):
+        #检查db是否存在，如不存在复制一个
+        log('creating new db file')
+        if not os.access(DB_NAME, os.W_OK):
+            src = os.path.join(os.path.dirname(__file__), EMPTY_DB)
+            import shutil
+            shutil.copy(src, DB_NAME)
+            os.chmod(DB_NAME,0660)
+
         #第一次启动时运行，将所有downloading修改为inqueue
         db = self._db()
         db.update('Task', where="status = %d" % task.STATUS_DOWNLOADING, status = "%d" % task.STATUS_QUEUED)

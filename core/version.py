@@ -3,11 +3,18 @@ VERSION = "0.1"
 AUTHOR = 'clowwindy'
 EMAIL = "clowwindy42@gmail.com"
 
-DESCRIPTION = """%s %s
+SHORT_DESCRIPTION = "a background HTTP download manager with a web interface."
+
+DESCRIPTION = """%s %s, %s
 Author: %s
-A HTTP download daemon with a web interface.
+Please send bug reports to: %s
+""" % (APP_NAME, VERSION, SHORT_DESCRIPTION, AUTHOR, EMAIL)
 
-Bug report:
-%s
-""" % (APP_NAME, VERSION, AUTHOR, EMAIL)
+USAGE = '''
+Usage:
+pywebget [options...]
+-d  Run as daemon
+-c <file> Specify which config file to read and write
+-
 
+'''

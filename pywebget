@@ -5,8 +5,11 @@ import signal, os, sys
 from core.controller import Controller
 import core.utils
 import core.version
+import core.param_parser
 
 print core.version.DESCRIPTION
+
+core.param_parser.parse_args()
 
 def sig_handler(signum, frame):
     from core.utils import log
