@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-__author__ = 'clowwindy'
-
 
 import threading
 import signal, os, sys

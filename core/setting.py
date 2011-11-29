@@ -1,5 +1,7 @@
 __author__ = 'clowwindy'
 
+DEBUG = False
+
 import codecs
 try:
     import json
@@ -10,6 +12,7 @@ from web.utils import Storage
 SETTING_FILE = "settings.json"
 
 defaults = Storage({
+    "port":8090,
     "download_path" : ".",
     "buf_size" : 256 * 1024,
     "thread_limit": 2,

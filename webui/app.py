@@ -171,8 +171,9 @@ def run():
         '/all_data', 'all_data',
         )
     global application
+    web.debug.write = lambda (a):None
     application = web.application(urls, globals(), autoreload=False)
-    application.run()
+    application.run("0.0.0.0:%d" % controller.settings.port)
 
 def stop():
     global application

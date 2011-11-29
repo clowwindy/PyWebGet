@@ -163,6 +163,7 @@ milestone：
 		hash功能
 		
 	软件包化：
+	    命令行化
 		程序名称和版本，User-Agent，License
 		界面美化
 		命令行解析，可以指定配置文件和数据库目录

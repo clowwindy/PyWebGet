@@ -489,7 +489,12 @@ class DB:
 
         self._ctx = threadeddict()
         # flag to enable/disable printing queries
-        self.printing = config.get('debug_sql', config.get('debug', False))
+
+        import core.setting
+        if core.setting.DEBUG:
+            self.printing = config.get('debug_sql', config.get('debug', False))
+        else:
+            self.printing = False
         self.supports_multiple_insert = False
         
         try:

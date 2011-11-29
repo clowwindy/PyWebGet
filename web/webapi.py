@@ -370,9 +370,9 @@ def debug(*args):
     """
     Prints a prettyprinted version of `args` to stderr.
     """
-    try: 
+    try:
         out = ctx.environ['wsgi.errors']
-    except: 
+    except:
         out = sys.stderr
     for arg in args:
         print >> out, pprint.pformat(arg)

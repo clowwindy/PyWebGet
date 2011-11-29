@@ -298,7 +298,7 @@ class application:
 
         return wsgi
 
-    def run(self, *middleware):
+    def run(self, addr="0.0.0.0:8080", *middleware):
         """
         Starts handling requests. If called in a CGI or FastCGI context, it will follow
         that protocol. If called from the command line, it will start an HTTP
@@ -308,7 +308,7 @@ class application:
         `middleware` is a list of WSGI middleware which is applied to the resulting WSGI
         function.
         """
-        return wsgi.runwsgi(self.wsgifunc(*middleware))
+        return wsgi.runwsgi(self.wsgifunc(*middleware),addr=addr)
 
     def stop(self):
         wsgi.httpserver.server.stop()

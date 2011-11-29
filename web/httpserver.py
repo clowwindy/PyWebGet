@@ -146,10 +146,10 @@ def runsimple(func, server_address=("0.0.0.0", 8080)):
     global server
     server = WSGIServer(server_address, func)
 
-    if server.ssl_adapter:
-        print "https://%s:%d/" % server_address
-    else:
-        print "http://%s:%d/" % server_address
+#    if server.ssl_adapter:
+#        print "https://%s:%d/" % server_address
+#    else:
+#        print "http://%s:%d/" % server_address
 
     try:
         server.start()
@@ -313,4 +313,6 @@ class LogMiddleware:
         time = self.log_date_time_string()
 
         msg = self.format % (host, time, protocol, method, req, status)
-        print >> outfile, utils.safestr(msg)
+        import core.setting
+        if core.setting.DEBUG:
+            print >> outfile, utils.safestr(msg)
