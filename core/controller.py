@@ -105,13 +105,13 @@ class Controller(object):
         #TODO: 更新具体的设置
         self.update_event.set()
 
-    def add_task(self, url, cookie="", referrer = "", set_update_event = True):
+    def add_task(self, url, cookie="", referer = "", set_update_event = True):
         import re
         if re.match(r"[^:]+://[^/]+/?([^?#]*)",url):
             db = self._db()
             db.insert('Task', url=url,
                       cookie=cookie,
-                      referrer=referrer,
+                      referer=referer,
                       filename=self._get_filename_by_url(url),
                       date_created=time.time())
             if set_update_event:
@@ -169,10 +169,10 @@ class Controller(object):
             db.delete('Task',  where="id = %d" % task_id)
             log("deleted: " + str(task_id))
 
-    def add_tasks(self, urls,cookie="",referrer=""):
+    def add_tasks(self, urls,cookie="",referer=""):
         try:
             for a_url in urls:
-                self.add_task(a_url,cookie=cookie,referrer=referrer,set_update_event=False)
+                self.add_task(a_url,cookie=cookie,referer=referer,set_update_event=False)
         finally:
             #if an error is raised when one of the urls is valid, set event before leaving
             self.update_event.set()

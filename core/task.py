@@ -3,6 +3,8 @@
 import socket
 import os, urllib2
 import threading
+import httplib
+import urlparse
 from utils import log
 
 __author__ = 'clowwindy'
@@ -19,6 +21,7 @@ STATUS_DELETED = 128
 
 ERROR_UNKNOWN = 0
 ERROR_TIMEOUT = 1
+
 
 def str_by_status(status):
     if status == STATUS_QUEUED:
@@ -55,13 +58,13 @@ class Task(object):
 
     def download(self):
         # handle errors, and retry
+        url = self.task.url
         while self.task.status == STATUS_DOWNLOADING:
             self.retry_count += 1
             f = None
             netfile = None
             try:
                 cur_length = 0
-                url = self.task.url
 
                 log("download %s, try %d" % (url, self.retry_count))
 
@@ -69,27 +72,50 @@ class Task(object):
                 if os.path.exists(filename):
                     cur_length = os.path.getsize(filename)
 
-                range = "bytes=%d-"%(cur_length,)
-
                 request = urllib2.Request(url)
-                request.add_header("Range", range)
+
+                if cur_length > 0:
+                    range = "bytes=%d-"%(cur_length,)
+                    request.add_header("Range", range)
+
+                cookie = self.task.cookie
+                if cookie is not None and cookie != "":
+                    request.add_header("Cookie", cookie)
+
+                referer = self.task.referer
+                if referer is not None and referer != "":
+                    request.add_header("Referer", referer)
+
                 opener = urllib2.build_opener()
                 netfile = opener.open(request, timeout = self.timeout)
                 headers = netfile.headers.dict
 
+                should_append = False
                 if netfile.code == 200:
-                    cur_length = self.task.completed_size = 0
-                    f = open(filename,'wb',BUF_SIZE)
+                    should_append = False
                 elif netfile.code == 206:
-                    self.task.completed_size = cur_length
-                    f = open(filename,'ab',BUF_SIZE)
+                    should_append = True
+                elif netfile.code == 301 or netfile.code == 302:
+                    url = urlparse.urljoin(url, headers["location"])
+                    raise httplib.HTTPException(str(netfile.code))
+                elif netfile.code == 416:
+                    #TODO range错误，重下
+                    raise httplib.HTTPException()
                 else:
                     #TODO 处理301等情况
-                    raise
+
+                    raise httplib.HTTPException()
                 if headers.has_key('content-length'):
                     self.task.total_size = int(headers['content-length']) + self.task.completed_size
                     if self.onupdating_total_size:
                         self.onupdating_total_size(self)
+
+                if should_append:
+                    self.task.completed_size = cur_length
+                    f = open(filename,'ab',BUF_SIZE)
+                else:
+                    cur_length = self.task.completed_size = 0
+                    f = open(filename,'wb',BUF_SIZE)
 
                 data = netfile.read(CHUNK_SIZE)
 

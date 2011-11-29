@@ -47,7 +47,7 @@ class add_task:
         try:
             data = json.loads(web.data())
             #TODO: 支持多个URL
-            controller.add_tasks(data['urls'].splitlines(), data['cookie'], data['referrer'])
+            controller.add_tasks(data['urls'].splitlines(), data['cookie'], data['referer'])
             return '"OK"'
         except Exception, e:
             return json.dumps(unicode(e))

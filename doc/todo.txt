@@ -1,6 +1,6 @@
 ﻿
 需求：
-	输入下载链接和cookie、referrer、相对目录设置
+	输入下载链接和cookie、referer、相对目录设置
 	实现断点续传
 	//实现限速
 	限制下载并发数，自动排队下载
@@ -44,7 +44,7 @@
 		filename
 		dir		保存文件的相对目录
 		cookie
-		referrer
+		referer
 		priority	下载优先级
 		total_size
 		date_create		创建任务的时间
@@ -74,7 +74,7 @@ status:
 	pycurl
 		多任务下载（curlmulti实在看不懂，用多线程实现）
 		添加cookie
-		设置referrer
+		设置referer
 		保存到文件
 		获取进度 //和速度
 		暂停和取消
@@ -98,7 +98,7 @@ status:
 		filename
 		dir		保存文件的相对目录
 		cookie
-		referrer
+		referer
 		priority	下载优先级
 		total_size
 		date_create		创建任务的时间
@@ -150,13 +150,16 @@ milestone：
         检查配置错误，例如下载保存目录不存在
 
     高级下载功能：
-        批量添加
+        批量添加    OK
 		处理超时    OK
-		相对目录，Cookie，Referrer
+		Cookie，Referrer OK
 		自动设置文件名（后面加1 2 3……）
 		未完成文件加.part
+		处理重定向
+		相对目录
 		调整顺序
 		前端输入校验
+		处理HTTP 416
 		hash功能
 		
 	软件包化：

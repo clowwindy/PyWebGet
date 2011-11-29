@@ -266,7 +266,7 @@ $(function() {
             minWidth:390,
             show: dialog_effect,
             hide: dialog_effect,
-            buttons: { "Ok": function() {
+            buttons: { "OK": function() {
                 add_task();
                 $(this).dialog("close");
             },
@@ -316,7 +316,7 @@ function add_task() {
     var data = JSON.stringify({
         "urls":$("#urls").val(),
         "cookie":$("#cookie").val(),
-        "referrer":$("#referrer").val()
+        "referer":$("#referer").val()
     });
     $.ajax("/add_task", {
         data: data,
@@ -366,7 +366,7 @@ function show_preferences_dialog() {
         minWidth:390,
         show: dialog_effect,
         hide: dialog_effect,
-        buttons: { "Ok": function() {
+        buttons: { "OK": function() {
             save_preferences();
             $(this).dialog("close");
         },
