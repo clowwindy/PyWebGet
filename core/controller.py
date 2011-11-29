@@ -33,8 +33,8 @@ class Controller(object):
 
     def init(self):
         #检查db是否存在，如不存在复制一个
-        log('creating new db file')
         if not os.access(DB_NAME, os.W_OK):
+            log('creating new db file')
             src = os.path.join(os.path.dirname(__file__), EMPTY_DB)
             import shutil
             shutil.copy(src, DB_NAME)
