@@ -18,7 +18,7 @@ def sig_handler(signum, frame):
 
 
 if os.name == 'posix':
-    signal.signal(signal.SIGABRT, sig_handler)
+    signal.signal(signal.SIGQUIT, sig_handler)
     signal.signal(signal.SIGTERM, sig_handler)
     signal.signal(signal.SIGINT, sig_handler)
     signal.signal(signal.SIGUSR1, sig_handler)
