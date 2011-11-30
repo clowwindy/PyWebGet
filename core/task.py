@@ -68,6 +68,9 @@ class Task(object):
 
                 log("download %s, try %d" % (url, self.retry_count))
 
+                if not os.access(self.download_path, os.X_OK):
+                    os.makedirs(self.download_path)
+
                 filename = self.download_path + "/" +self.task.filename
                 if os.path.exists(filename):
                     cur_length = os.path.getsize(filename)

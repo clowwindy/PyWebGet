@@ -17,7 +17,7 @@ cp -r static build_deb/$name$install_path
 cp -r web build_deb/$name$install_path
 cp -r webui build_deb/$name$install_path
 cp -r core build_deb/$name$install_path
-cp pywebget build_deb/$name$install_path
+cp pywebget build_deb/$name$install_path/pywebget
 cp LICENSE build_deb/$name$install_path
 cp README build_deb/$name$install_path
 
@@ -31,5 +31,6 @@ cp -u ../../packaging/debian/control DEBIAN/
 cp -u ../../packaging/debian/ DEBIAN/
 cp -u ../../packaging/debian/* DEBIAN/
 cp -u ../../packaging/debian/* DEBIAN/
+sudo chown root:root -R .
 cd ..
 dpkg-deb --build pywebget-0.1

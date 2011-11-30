@@ -2,14 +2,13 @@ __author__ = 'clowwindy'
 
 DEBUG = False
 
-import codecs
+import codecs, os
 try:
     import json
 except ImportError:
     import simplejson as json
 from web.utils import Storage
-
-SETTING_FILE = "settings.json"
+from utils import log
 
 defaults = Storage({
     "port":8090,
@@ -23,6 +22,12 @@ defaults = Storage({
     "auth_password":"",
     "timeout":30,
 })
+
+if os.name == 'posix':
+    SETTING_FILE = os.path.expanduser('~/.pywebget/settings.json')
+    defaults.download_path = os.path.expanduser('~/Download')
+else:
+    SETTING_FILE = 'settings.json'
 
 settings_writable = ["download_path", "buf_size", "thread_limit", "retry_limit", "timeout"]
 
@@ -42,7 +47,6 @@ def load_settings():
         setting = json.loads(t)
         setting = Storage(dict(list(defaults.items()) + list(setting.items())))
     except Exception:
-        from utils import log
         log('settings file is invalid, load default settings')
         setting = Storage(defaults)
     finally:
@@ -61,3 +65,21 @@ def save_settings(settings):
     finally:
         if f:
             f.close()
+
+def check_paths():
+    if os.name == 'posix':
+        if not os.access(os.path.dirname(SETTING_FILE),os.X_OK):
+            try:
+                os.makedirs(os.path.dirname(SETTING_FILE))
+            except Exception:
+                log('invalid setting file path')
+                import sys
+                sys.exit(1)
+        import controller
+        if not os.access(os.path.dirname(controller.DB_NAME),os.X_OK):
+            try:
+                os.makedirs(os.path.dirname(controller.DB_NAME))
+            except Exception:
+                log('invalid database file path')
+                import sys
+                sys.exit(1)

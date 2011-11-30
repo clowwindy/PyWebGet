@@ -6,7 +6,11 @@ import web, task, threading, types, time, urllib, os
 from utils import log
 import setting
 
-DB_NAME = 'db.sqlite3'
+if os.name == 'posix':
+    DB_NAME = os.path.expanduser('~/.pywebget/db.sqlite3')
+else:
+    DB_NAME = 'db.sqlite3'
+
 DB_TYPE = 'sqlite'
 
 EMPTY_DB = "../share/empty.db"

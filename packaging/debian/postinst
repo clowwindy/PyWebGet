@@ -1,0 +1,10 @@
+#! /bin/sh
+
+test -f /usr/bin/pywebget] && rm -f /usr/bin/pywebget
+ln -s /opt/pywebget/pywebget /usr/bin/pywebget
+
+useradd debian-pywebget -U -M -s /usr/sbin/nologin
+
+touch /var/run/pywebget.pid
+mkdir /etc/pywebget
+touch /etc/pywebget.conf

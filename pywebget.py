@@ -21,6 +21,8 @@ if args.stop:
 if args.restart:
     daemon.restart(args.pid_file)
 
+core.setting.check_paths()
+
 def sig_handler(signum, frame):
     from core.utils import log
     log("exiting")
