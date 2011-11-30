@@ -6,4 +6,5 @@ Maintainer: clowwindy <clowwindy42@gmail.com>
 Homepage: https://github.com/clowwindy
 Architecture: all
 Depends: python(>= 2.5), python (<< 2.8)
-Description: a background HTTP download manager with a web interface.
+Description: PyWebGet
+ a background HTTP download manager with a web interface.

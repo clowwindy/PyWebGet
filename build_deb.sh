@@ -28,6 +28,7 @@ cp pywebget.py build/$name$install_path/pywebget
 cp LICENSE build/$name$install_path
 cp README build/$name$install_path
 
+find build/$name$install_path -name '*.pyc' -print | xargs rm -f
 
 # copy init scripts
 
