@@ -1,0 +1,10 @@
+Package: pywebget
+Version: 0.1
+Section: misc
+Priority: optional
+Maintainer: clowwindy <clowwindy42@gmail.com>
+Homepage: https://github.com/clowwindy
+Architecture: all
+Depends: python
+Provides: python-pywebget
+Description: a background HTTP download manager with a web interface.

@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f *-stamp
+	rm -rf compile build
+	find -name '*.py[co]' -exec rm -f {} \;
+	dh_clean
+
+install:
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	python setup.py install --root=$(CURDIR)/debian/bugz/ --prefix=/usr
+	dh_install
+
+binary-indep: install
+	dh_testdir
+	dh_testroot
+	dh_pycentral
+	dh_installchangelogs ChangeLog
+	dh_installdocs
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep
+
+binary-arch:
+
+.PHONY: build clean binary-indep binary install
