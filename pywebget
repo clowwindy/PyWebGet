@@ -6,10 +6,20 @@ from core.controller import Controller
 import core.utils
 import core.version
 import core.param_parser
+from core import daemon
 
 print core.version.DESCRIPTION
 
-core.param_parser.parse_args()
+args = core.param_parser.parse_args()
+if args.verbose:
+    import core.setting
+    core.setting.DEBUG = True
+if args.background:
+    daemon.start(args.pid_file)
+if args.stop:
+    daemon.stop(args.pid_file)
+if args.restart:
+    daemon.restart(args.pid_file)
 
 def sig_handler(signum, frame):
     from core.utils import log

@@ -34,7 +34,8 @@ class Controller(object):
     def init(self):
         #检查db是否存在，如不存在复制一个
         if not os.access(DB_NAME, os.W_OK):
-            log('creating new db file')
+            if setting.DEBUG:
+                log('creating new db file')
             src = os.path.join(os.path.dirname(__file__), EMPTY_DB)
             import shutil
             shutil.copy(src, DB_NAME)
@@ -53,7 +54,8 @@ class Controller(object):
         for a_task in tasks:
             if a_task.status == task.STATUS_QUEUED:
                 if task_running >= self.thread_limit:
-                    log("over limit")
+                    if setting.DEBUG:
+                        log("over limit")
                     break
                 a_task.status = task.STATUS_DOWNLOADING
                 self._update_task_status(db, task.STATUS_DOWNLOADING, a_task)
@@ -66,7 +68,8 @@ class Controller(object):
                 task_running += 1
 
     def run_task(self, a_task):
-        log("download thread started")
+        if setting.DEBUG:
+            log("download thread started")
         thread = threading.currentThread()
         ti = None
         try:
@@ -89,7 +92,8 @@ class Controller(object):
                 self.tasks.remove(ti)
             self.threads.remove(thread)
             self.lock.release()
-            log("download thread stopped")
+            if setting.DEBUG:
+                log("download thread stopped")
 
     def run(self):
         self.controller_thread = threading.currentThread()
@@ -98,16 +102,18 @@ class Controller(object):
             self.update_tasks()
             self.update_event.clear()
             self.update_event.wait(CHECK_INTERVAL)
-
-        log('controller stopped')
+        if setting.DEBUG:
+            log('controller stopped')
 
     def stop(self):
-        log('controller stopping')
+        if setting.DEBUG:
+            log('controller stopping')
         if self.status == STATUS_RUNNING:
             self.status = STATUS_STOPPING
             setting.save_settings(self.settings)
         for a_task in list(self.tasks):
-            log('pausing task ' + a_task.url)
+            if setting.DEBUG:
+                log('pausing task ' + a_task.url)
             self.pause_task(a_task, dontsave=True)
         self.update_event.set()
         self.controller_thread.join()
@@ -245,7 +251,8 @@ class Controller(object):
             db = self._db()
             db.delete('Task',  where="id = %d" % a_task.id)
         else:
-            log("status changed: "+a_task.url + " " + str(a_task.status))
+            if setting.DEBUG:
+                log("status changed: "+a_task.url + " " + str(a_task.status))
             db = self._db()
             db.update('Task', where="id = %d" % a_task.id, completed_size = "%d" % a_task.completed_size, filename=a_task.filename)
 
