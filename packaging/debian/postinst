@@ -3,7 +3,9 @@
 test -f /usr/bin/pywebget && rm -f /usr/bin/pywebget
 ln -s /opt/pywebget/pywebget /usr/bin/pywebget
 
-useradd debian-pywebget -U -M -s /usr/sbin/nologin
+if ! getent passwd debian-pywebget >/dev/null; then
+    useradd debian-pywebget --system --no-create-home --user-group --home-dir /var/run/debian-pywebget -s /usr/sbin/nologin
+fi
 
 ! test -d /var/run/pywebget && mkdir /var/run/pywebget
 chown debian-pywebget:debian-pywebget /var/run/pywebget
@@ -12,10 +14,16 @@ chmod 755 /var/run/pywebget
 ! test -d /etc/pywebget && mkdir /etc/pywebget
 chmod 755 /etc/pywebget
 
-touch /etc/pywebget/setting.json
-chown debian-pywebget:debian-pywebget /etc/pywebget/setting.json
-chmod 600 /etc/pywebget/setting.json
+touch /etc/pywebget/settings.json
+chown debian-pywebget:debian-pywebget /etc/pywebget/settings.json
+chmod 600 /etc/pywebget/settings.json
 
 ! test -d /var/lib/pywebget && mkdir /var/lib/pywebget
 chown debian-pywebget:debian-pywebget /var/lib/pywebget
 chmod 700 /var/lib/pywebget
+
+update-rc.d pywebget defaults >/dev/null
+
+/etc/init.d/pywebget start
+
+exit 0

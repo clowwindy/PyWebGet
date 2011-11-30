@@ -8,10 +8,12 @@ parser.add_argument('-c', '--config-file', metavar="FILE", help='specify config 
 parser.add_argument('-d', '--db-file', metavar="FILE", help='specify database file')
 
 if os.name == 'posix':
-    parser.add_argument('-b', '--background', action='store_true', help='go to background after startup')
-    parser.add_argument('-s', '--stop', action='store_true', help='stop background daemon')
-    parser.add_argument('-r', '--restart', action='store_true', help='restart background daemon')
-    parser.add_argument('-p', '--pid-file',  metavar="FILE", type=argparse.FileType('rw'), help='specify PID file')
+    daemon_group = parser.add_argument_group('Daemon options')
+    daemon_group.add_argument('-b', '--background', action='store_true', help='go to background after startup')
+    daemon_group.add_argument('-s', '--stop', action='store_true', help='stop background daemon')
+    daemon_group.add_argument('-r', '--restart', action='store_true', help='restart background daemon')
+    daemon_group.add_argument('-p', '--pid-file',  metavar="FILE", help='specify PID file')
+    daemon_group.add_argument('-u', '--user',  metavar="USERNAME", help='specify username to run as')
 
 parser.add_argument('-v', '--verbose', action='store_true', help='print debug info')
 

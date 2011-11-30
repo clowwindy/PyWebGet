@@ -7,9 +7,9 @@ from utils import log
 import setting
 
 if os.name == 'posix':
-    DB_NAME = os.path.expanduser('~/.pywebget/db.sqlite3')
+    DB_NAME = os.path.expanduser('~/.pywebget/db.sqlite')
 else:
-    DB_NAME = 'db.sqlite3'
+    DB_NAME = 'db.sqlite'
 
 DB_TYPE = 'sqlite'
 

@@ -1,9 +1,25 @@
 #! /bin/sh
 
-/etc/init.d/pywebget stop
+case $1 in
+    remove)
+        rm /usr/bin/pywebget
+        ;;
+	purge)
+		rm -f /etc/pywebget/settings.json
+		rmdir --ignore-fail-on-non-empty /etc/pywebget
 
-rm -f /usr/bin/pywebget
+		rm -f /var/lib/pywebget/db.sqlite
+		rmdir --ignore-fail-on-non-empty /var/lib/pywebget
 
-rm -rf /var/run/pywebget
+		rm -f /var/run/pywebget/pywebget.pid
+		rmdir --ignore-fail-on-non-empty /var/run/pywebget
 
-userdel debian-pywebget
+		update-rc.d pywebget remove >/dev/null
+
+		if which deluser >/dev/null 2>&1; then
+			deluser --quiet debian-pywebget > /dev/null || true
+		fi
+		;;
+esac
+
+exit 0

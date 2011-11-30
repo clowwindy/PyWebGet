@@ -28,8 +28,13 @@ cp pywebget.py build/$name$install_path/pywebget
 cp LICENSE build/$name$install_path
 cp README build/$name$install_path
 
-cd build/
 
+# copy init scripts
+
+mkdir -p build/$name/etc/init.d/
+cp packaging/debian/init.sh build/$name/etc/init.d/pywebget
+
+cd build/
 tar -czf $name.orig.tar.gz $name/
 
 # copy debian scripts
@@ -37,6 +42,7 @@ cd $name/
 mkdir DEBIAN
 cp -u ../../packaging/debian/control DEBIAN/
 cp -u ../../packaging/debian/postinst DEBIAN/
+cp -u ../../packaging/debian/prerm DEBIAN/
 cp -u ../../packaging/debian/postrm DEBIAN/
 
 sudo chown root:root -R .

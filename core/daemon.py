@@ -42,13 +42,13 @@ def set_pid(pidfile):
         if f:
             f.close()
 
-def start(pidfile):
+def start(pidfile,username=None):
     log("starting daemon")
     if pidfile is None:
         pidfile = DEFAULT_PID_FILE
     pid = get_pid(pidfile)
     if pid != 0 and pid_exists(pid):
-        log("daemon pid %d already running" % pid)
+        log("daemon pid %d is already running" % pid)
         sys.exit(0)
     pid = os.fork()
     if pid:
@@ -61,6 +61,15 @@ def start(pidfile):
             pass
         set_pid(pidfile)
         os.setsid()
+        if username:
+            import pwd
+            try:
+                uid = pwd.getpwnam(username)[2]
+                os.setuid(uid)
+            except KeyError:
+                log("can't find user")
+                sys.exit(1)
+
 
 def stop(pidfile, exit=True):
     log("stopping daemon")
@@ -90,8 +99,8 @@ def stop(pidfile, exit=True):
     else:
         return result
 
-def restart(pidfile):
+def restart(pidfile,username=None):
     if pidfile is None:
         pidfile = DEFAULT_PID_FILE
     if stop(pidfile, False):
-        start(pidfile)
+        start(pidfile,username)

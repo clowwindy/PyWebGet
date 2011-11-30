@@ -1,0 +1,23 @@
+#! /bin/sh
+
+echo $1
+
+case "$1" in
+    remove|deconfigure|upgrade)
+        if [ -x /etc/init.d/pywebget ]; then
+            if [ -x /usr/sbin/invoke-rc.d ]; then
+                invoke-rc.d pywebget stop
+            else
+                /etc/init.d/pywebget stop
+            fi
+        fi
+        ;;
+    failed-upgrade)
+        ;;
+    *)
+        echo "prerm called with unknown argument \`$1'" >&2
+        exit 0
+    ;;
+esac
+
+exit 0
