@@ -30,6 +30,21 @@ cp README build/$name$install_path
 
 find build/$name$install_path -name '*.pyc' -print | xargs rm -f
 
+# minimize js files
+
+java -jar packaging/utils/yuicompressor-2.4.6.jar build/$name$install_path/static/js/jquery.dataTables.js -o build/$name$install_path/static/js/jquery.dataTables.min.js
+rm -f build/$name$install_path/static/js/jquery.dataTables.js
+mv build/$name$install_path/static/js/jquery.dataTables.min.js build/$name$install_path/static/js/jquery.dataTables.js
+
+java -jar packaging/utils/yuicompressor-2.4.6.jar build/$name$install_path/static/js/pywebget.js -o build/$name$install_path/static/js/pywebget.min.js
+rm -f build/$name$install_path/static/js/pywebget.js
+mv build/$name$install_path/static/js/pywebget.min.js build/$name$install_path/static/js/pywebget.js
+
+java -jar packaging/utils/yuicompressor-2.4.6.jar build/$name$install_path/static/css/Aristo/Aristo.css -o build/$name$install_path/static/css/Aristo/Aristo.min.css
+rm -f build/$name$install_path/static/css/Aristo/Aristo.css
+mv build/$name$install_path/static/css/Aristo/Aristo.min.css build/$name$install_path/static/css/Aristo/Aristo.css
+
+
 # copy init scripts
 
 mkdir -p build/$name/etc/init.d/
