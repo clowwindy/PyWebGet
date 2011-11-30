@@ -21,6 +21,10 @@ simplejson
 http://pypi.python.org/pypi/simplejson/
 MIT License
 
+argparse
+http://code.google.com/p/argparse/
+License: Python Software Foundation License
+
 DataTable
 http://www.datatables.net/
 DataTables is dual licensed under the GPL v2 license or a BSD (3-point) license.

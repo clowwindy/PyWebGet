@@ -14,12 +14,14 @@ args = core.param_parser.parse_args()
 if args.verbose:
     import core.setting
     core.setting.DEBUG = True
-if args.background:
-    daemon.start(args.pid_file, args.user)
-if args.stop:
-    daemon.stop(args.pid_file)
-if args.restart:
-    daemon.restart(args.pid_file, args.user)
+
+if os.name == 'posix':
+    if args.background:
+        daemon.start(args.pid_file, args.user)
+    if args.stop:
+        daemon.stop(args.pid_file)
+    if args.restart:
+        daemon.restart(args.pid_file, args.user)
 
 core.setting.check_paths()
 
