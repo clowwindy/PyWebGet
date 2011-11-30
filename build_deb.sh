@@ -51,6 +51,9 @@ mkdir -p build/$name/etc/init.d/
 cp packaging/debian/init.sh build/$name/etc/init.d/pywebget
 
 cd build/
+
+size=`du -sB 1024 --apparent-size|awk '{print $1}'`
+
 tar -czf $name.orig.tar.gz $name/
 
 # copy debian scripts
@@ -60,6 +63,9 @@ cp -u ../../packaging/debian/control DEBIAN/
 cp -u ../../packaging/debian/postinst DEBIAN/
 cp -u ../../packaging/debian/prerm DEBIAN/
 cp -u ../../packaging/debian/postrm DEBIAN/
+
+sed -i '$a\
+Installed-Size: '$size DEBIAN/control
 
 sudo chown root:root -R .
 cd ..
