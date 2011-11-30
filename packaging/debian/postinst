@@ -1,10 +1,21 @@
 #! /bin/sh
 
-test -f /usr/bin/pywebget] && rm -f /usr/bin/pywebget
+test -f /usr/bin/pywebget && rm -f /usr/bin/pywebget
 ln -s /opt/pywebget/pywebget /usr/bin/pywebget
 
 useradd debian-pywebget -U -M -s /usr/sbin/nologin
 
-touch /var/run/pywebget.pid
-mkdir /etc/pywebget
-touch /etc/pywebget.conf
+! test -d /var/run/pywebget && mkdir /var/run/pywebget
+chown debian-pywebget:debian-pywebget /var/run/pywebget
+chmod 755 /var/run/pywebget
+
+! test -d /etc/pywebget && mkdir /etc/pywebget
+chmod 755 /etc/pywebget
+
+touch /etc/pywebget/setting.json
+chown debian-pywebget:debian-pywebget /etc/pywebget/setting.json
+chmod 600 /etc/pywebget/setting.json
+
+! test -d /var/lib/pywebget && mkdir /var/lib/pywebget
+chown debian-pywebget:debian-pywebget /var/lib/pywebget
+chmod 700 /var/lib/pywebget

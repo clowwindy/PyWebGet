@@ -1,3 +1,9 @@
 #! /bin/sh
 
+/etc/init.d/pywebget stop
+
 rm -f /usr/bin/pywebget
+
+rm -rf /var/run/pywebget
+
+userdel debian-pywebget

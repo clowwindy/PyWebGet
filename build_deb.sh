@@ -7,30 +7,42 @@ export DEBEMAIL="clowwindy42@gmail.com"
 name=pywebget-0.1
 install_path=/opt/pywebget/
 
-rm -rf build_deb
-mkdir -p build_deb/$name$install_path
+# check if is run as root
+if [ "$(id -u)" != "0" ]; then
+   echo "This script must be run as root" 1>&2
+   exit 1
+fi
 
-cp -r core build_deb/$name$install_path
-cp -r share build_deb/$name$install_path
-cp -r simplejson build_deb/$name$install_path
-cp -r static build_deb/$name$install_path
-cp -r web build_deb/$name$install_path
-cp -r webui build_deb/$name$install_path
-cp -r core build_deb/$name$install_path
-cp pywebget build_deb/$name$install_path/pywebget
-cp LICENSE build_deb/$name$install_path
-cp README build_deb/$name$install_path
+# copy files
+rm -rf build
+mkdir -p build/$name$install_path
 
-cd build_deb/
+cp -r core build/$name$install_path
+cp -r share build/$name$install_path
+cp -r simplejson build/$name$install_path
+cp -r static build/$name$install_path
+cp -r web build/$name$install_path
+cp -r webui build/$name$install_path
+cp -r core build/$name$install_path
+cp pywebget.py build/$name$install_path/pywebget
+cp LICENSE build/$name$install_path
+cp README build/$name$install_path
+
+cd build/
 
 tar -czf $name.orig.tar.gz $name/
+
+# copy debian scripts
 cd $name/
 mkdir DEBIAN
-cp -u ../../packaging/debian/changelog DEBIAN/
 cp -u ../../packaging/debian/control DEBIAN/
-cp -u ../../packaging/debian/ DEBIAN/
-cp -u ../../packaging/debian/* DEBIAN/
-cp -u ../../packaging/debian/* DEBIAN/
+cp -u ../../packaging/debian/postinst DEBIAN/
+cp -u ../../packaging/debian/postrm DEBIAN/
+
 sudo chown root:root -R .
 cd ..
+
+# make deb
 dpkg-deb --build pywebget-0.1
+rm -rf ../build/$name
+rm -f ../build/$name.orig.tar.gz
