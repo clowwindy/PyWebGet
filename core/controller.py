@@ -269,7 +269,7 @@ class Controller(object):
     def _oncomplete(self, a_task):
         db = self._db()
         self._update_task_status(db, task.STATUS_COMPLETED, a_task)
-        db.update('Task', where="id = %d" % a_task.id, date_completed = "%d" % time.time(),completed_size = "%d" % a_task.completed_size, filename=a_task.filename)
+        db.update('Task', where="id = %d" % a_task.id, date_completed = "%d" % time.time(),completed_size = "%d" % a_task.completed_size, total_size = "%d" % a_task.total_size, filename=a_task.filename)
         log("complete: "+a_task.url)
         self.update_event.set()
 

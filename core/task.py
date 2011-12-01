@@ -21,7 +21,7 @@ STATUS_DELETED = 128
 
 ERROR_UNKNOWN = 0
 ERROR_TIMEOUT = 1
-
+ERROR_FILE_SIZE_LARGER_THAN_CONTENT_LENGTH = 2
 
 def str_by_status(status):
     if status == STATUS_QUEUED:
@@ -133,13 +133,31 @@ class Task(object):
                     data = netfile.read(CHUNK_SIZE)
                 f.flush()
 
+                complete = True
+
+                # check status
+
                 if self.task.status == STATUS_PAUSED or self.task.status == STATUS_QUEUED or self.task.status == STATUS_DELETED:
                     if self.onstatus_change:
                         self.onstatus_change(self)
+                    complete = False
                 else:
+                    # check file size
+                    if self.task.total_size == 0:
+                        # file size unknown
+                        self.task.total_size = self.task.completed_size
+                    elif self.task.total_size < self.task.completed_size:
+                        # this is critical error, do NOT retry
+                        if self.onerror:
+                            self.onerror(self, ERROR_FILE_SIZE_LARGER_THAN_CONTENT_LENGTH)
+                        return
+                    elif self.task.total_size > self.task.completed_size:
+                        # not complete, retry
+                        complete = False
+                if complete:
                     if self.oncomplete:
                         self.oncomplete(self)
-                return
+                    return
             except socket.timeout:
                 import traceback
                 traceback.print_exc()
