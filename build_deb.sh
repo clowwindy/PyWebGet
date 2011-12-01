@@ -68,10 +68,13 @@ cp -u ../../packaging/debian/postrm DEBIAN/
 sed -i '$a\
 Installed-Size: '$size DEBIAN/control
 
-sudo chown root:root -R .
+chown root:root -R .
 cd ..
 
 # make deb
-dpkg-deb --build pywebget-0.1
+dpkg-deb --build $name
 rm -rf ../build/$name
 rm -f ../build/$name.orig.tar.gz
+
+chmod 777 .
+chmod 666 $name.deb
