@@ -6,7 +6,20 @@ body {
 }
 
 #toolbar {
-    padding: 10px;
+    padding: 5px;
+    float:left;
+    width: 400px;
+}
+
+#download_list_table_filter {
+    margin-top: 13px;
+}
+
+#download_list_table_filter input {
+    width: 150px;
+}
+.dataTables_info, .dataTables_filter {
+    width:inherit;
 }
 
 .toolbar_icon {

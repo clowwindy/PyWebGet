@@ -54,6 +54,7 @@ function init_table() {
 //        "bProcessing": true,
 //        "bDestroy": true,
 //        "sAjaxSource": "/task_list",
+        "sDom":'<"H"<"toolbar"fr>>t<"F"lip>',
         "sScrollY": 400,
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
@@ -68,6 +69,7 @@ function init_table() {
         ],
         "aoColumns": columns
     });
+    $("div.toolbar").prepend($("#toolbar"));
 }
 
 function reload_preferences(){
@@ -297,7 +299,7 @@ function update_button_state() {
 }
 
 function set_table_size() {
-    var table_body_height = window.innerHeight - ($("#toolbar").outerHeight() +
+    var table_body_height = window.innerHeight - (
         $($("#download_list_table_wrapper>.ui-toolbar")[0]).outerHeight() +
         $($("#download_list_table_wrapper>.ui-toolbar")[1]).outerHeight() +
         $(".dataTables_scrollHead").outerHeight());
