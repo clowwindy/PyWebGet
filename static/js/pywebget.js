@@ -239,7 +239,7 @@
             if (row.status == STATUS_DOWNLOADING && instance.old_data) {
                 var cur_date = new Date();
                 var interval = RELOAD_INTERVAL;
-                if (window['last_check_date']) {
+                if (instance['last_check_date']) {
                     interval = cur_date - instance.last_check_date;
                     instance.last_check_date = cur_date;
                 }
