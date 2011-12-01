@@ -11,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="css/pywebget.css"/>
     <script src="js/jquery.js" type="text/javascript"></script>
     <script src="js/jquery-ui.custom.min.js" type="text/javascript"></script>
+    <script src="js/jquery.validate.min.js" type="text/javascript"></script>
     <script src="js/jquery.dataTables.js" type="text/javascript"></script>
     <script src="js/date.js" type="text/javascript"></script>
     <script src="js/lib.js" type="text/javascript"></script>
@@ -66,28 +67,30 @@
     </table>
 </div>
 <div id="preferences_dialog" class="dialog" style="display:none">
-    <table style="width:100%">
-        <tr>
-            <td style="width:105px">Download dir</td>
-            <td><input id="download_path" type="text" class="text"/></td>
-        </tr>
-        <tr>
-            <td>Buffer limit (per thread)</td>
-            <td><input id="buf_size" type="text" class="text number"/></td>
-        </tr>
-        <tr>
-            <td>Thread limit</td>
-            <td><input id="thread_limit" type="text" class="text number"/></td>
-        </tr>
-        <tr>
-            <td>Max retries</td>
-            <td><input id="retry_limit" type="text" class="text number"/></td>
-        </tr>
-        <tr>
-            <td>Timeout (In seconds)</td>
-            <td><input id="timeout" type="text" class="text number"/></td>
-        </tr>
-    </table>
+    <form id="preferences_form" onsubmit="return false">
+        <table style="width:100%">
+            <tr>
+                <td style="width:105px">Download dir</td>
+                <td><input id="download_path" name="download_path" type="text" class="text required"/></td>
+            </tr>
+            <tr>
+                <td>Buffer limit (per thread)</td>
+                <td><input id="buf_size" name="buf_size" type="text" class="text number required" min="4096"/></td>
+            </tr>
+            <tr>
+                <td>Thread limit</td>
+                <td><input id="thread_limit" name="thread_limit" type="text" class="text number required" min="1"/></td>
+            </tr>
+            <tr>
+                <td>Max retries</td>
+                <td><input id="retry_limit" name="retry_limit" type="text" class="text number required" min="0"/></td>
+            </tr>
+            <tr>
+                <td>Timeout (In seconds)</td>
+                <td><input id="timeout" name="timeout" type="text" class="text number required" min="1"/></td>
+            </tr>
+        </table>
+    </form>
 </div>
 <div id="dialog-alert" style="display:none">
     <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><span

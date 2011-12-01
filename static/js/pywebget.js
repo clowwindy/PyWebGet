@@ -335,27 +335,32 @@ function add_task() {
 
 function save_preferences(){
     var data = {};
-    for(var i in settings) {
-        var e = $(document.getElementById(i))
-        if(e.hasClass('number')){
-            data[i] = +e.val();
-        }else{
-            data[i] = e.val();
-        }
-    }
-    $.ajax('/save_preferences', {
-        data: JSON.stringify(data),
-        type: "POST",
-        dataType: "json",
-        cache:false,
-        success: function(d) {
-            if (d != 'OK') {
-                $.alert(d);
-            } else {
-                reload_preferences();
+    if($("#preferences_form").valid()) {
+        for(var i in settings) {
+            if(!settings.hasOwnProperty(i))continue;
+            var e = $(document.getElementById(i));
+            if(e.hasClass('number')){
+                data[i] = +e.val();
+            }else{
+                data[i] = e.val();
             }
         }
-    });
+        $.ajax('/save_preferences', {
+            data: JSON.stringify(data),
+            type: "POST",
+            dataType: "json",
+            cache:false,
+            success: function(d) {
+                if (d != 'OK') {
+                    $.alert(d);
+                } else {
+                    reload_preferences();
+                }
+            }
+        });
+        return true;
+    }
+    return false;
 }
 
 function show_preferences_dialog() {
@@ -367,8 +372,9 @@ function show_preferences_dialog() {
         show: dialog_effect,
         hide: dialog_effect,
         buttons: { "OK": function() {
-            save_preferences();
-            $(this).dialog("close");
+            if(save_preferences()){
+                $(this).dialog("close");
+            }
         },
             "Cancel": function() {
                 $(this).dialog("close");

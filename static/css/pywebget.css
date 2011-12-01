@@ -104,3 +104,13 @@ input, textarea, select {
     -webkit-border-top-left-radius: 7px !important;
     -webkit-border-top-right-radius: 7px !important;
 }
+
+/* validators */
+
+label.error {
+    color: #f33;
+}
+
+.error {
+    border-color: #f33 !important;
+}
