@@ -30,11 +30,11 @@ def get_pid(pidfile):
         if f:
             f.close()
 
-def set_pid(pidfile):
+def set_pid(pidfile,pid=os.getpid()):
     f = None
     try:
         f = open(pidfile, 'w')
-        f.write(str(os.getpid()))
+        f.write(str(pid))
         os.chmod(pidfile, 0600)
     except IOError:
         log("can't write pid file")
@@ -53,13 +53,21 @@ def start(pidfile,username=None):
     pid = os.fork()
     if pid:
         log("daemon pid %d started" % pid)
+        set_pid(pidfile,pid)
+        if username:
+            import pwd
+            try:
+                uid = pwd.getpwnam(username)[2]
+                os.chown(pidfile,uid,-1)
+            except KeyError:
+                log("can't find user")
+                sys.exit(1)
         sys.exit(0)
     else:
         try:
             sys.stdout = open("/dev/null", "w+")
         except Exception:
             pass
-        set_pid(pidfile)
         os.setsid()
         if username:
             import pwd

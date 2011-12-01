@@ -7,10 +7,6 @@ if ! getent passwd debian-pywebget >/dev/null; then
     useradd debian-pywebget --system --no-create-home --user-group --home-dir /var/run/debian-pywebget -s /usr/sbin/nologin
 fi
 
-! test -d /var/run/pywebget && mkdir /var/run/pywebget
-chown debian-pywebget:debian-pywebget /var/run/pywebget
-chmod 755 /var/run/pywebget
-
 ! test -d /etc/pywebget && mkdir /etc/pywebget
 chmod 755 /etc/pywebget
 

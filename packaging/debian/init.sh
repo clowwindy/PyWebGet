@@ -15,7 +15,7 @@
 BIN=/usr/bin/pywebget
 CONFIG_FILE=/etc/pywebget/settings.json
 DB_FILE=/var/lib/pywebget/db.sqlite
-PIDFILE=/var/run/pywebget/pywebget.pid
+PIDFILE=/var/run/pywebget.pid
 USERNAME=debian-pywebget
 
 BASE_DIR=/opt/pywebget
