@@ -2,7 +2,7 @@ __author__ = 'clowwindy'
 
 import argparse, os
 
-parser = argparse.ArgumentParser(usage='%(prog)s [options]')
+parser = argparse.ArgumentParser()
 parser.add_argument('-V', '--version', action='version')
 parser.add_argument('-c', '--config-file', metavar="FILE", help='specify config file')
 parser.add_argument('-d', '--db-file', metavar="FILE", help='specify database file')
@@ -28,4 +28,10 @@ def parse_args():
     if args.db_file:
         import controller
         controller.DB_NAME = args.db_file
+
+    if os.name == 'posix':
+        if [args.background, args.stop, args.restart].count(True) > 1:
+            parser.error("argument -b, -s, -r must be used seperately")
+            import sys
+            sys.exit(1)
     return args

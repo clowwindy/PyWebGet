@@ -25,7 +25,7 @@ defaults = Storage({
 
 if os.name == 'posix':
     SETTING_FILE = os.path.expanduser('~/.pywebget/settings.json')
-    defaults.download_path = os.path.expanduser('~/Download')
+    defaults.download_path = os.path.expanduser('/tmp')
 else:
     SETTING_FILE = 'settings.json'
 
