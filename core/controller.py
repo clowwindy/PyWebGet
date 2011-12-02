@@ -299,6 +299,7 @@ class Controller(object):
         try:
             i = -1
             while True:
+                # check if file exists. if exists, append (n) to filename
                 i += 1
                 if i > 0:
                     fileext = os.path.splitext(filename)
@@ -321,7 +322,7 @@ class Controller(object):
                     continue
                 a_task.task.filename = filename_to_test
                 a_task.task.partfilename = partfilename_to_test
-                db.update('Task', filename = filename_to_test, partfilename = partfilename_to_test)
+                db.update('Task', where="id=%d" % a_task.id, filename = filename_to_test, partfilename = partfilename_to_test)
                 self._close_db(db)
                 break
         finally:

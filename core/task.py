@@ -5,6 +5,7 @@ import os, urllib2
 import threading
 import httplib
 import urlparse
+import setting
 from utils import log
 
 __author__ = 'clowwindy'
@@ -66,7 +67,7 @@ class Task(object):
         for i in xrange(1, len(disposition)):
             disposition_parm = disposition[i].split('=')
             if len(disposition_parm) > 1 and disposition_parm[0].strip() == 'filename':
-                filename = urllib2.unquote(disposition_parm[1])
+                filename = urllib2.unquote(disposition_parm[1].strip('"'))
                 if len(filename) > 0:
                     return filename
                 else:
@@ -125,13 +126,14 @@ class Task(object):
                     should_append = True
                 elif netfile.code == 301 or netfile.code == 302:
                     url = urlparse.urljoin(url, headers["location"])
+                    if setting.DEBUG:
+                        log("HTTP 301: " + url)
                     raise httplib.HTTPException(str(netfile.code))
                 elif netfile.code == 416:
                     #TODO range错误，重下
                     raise httplib.HTTPException()
                 else:
-                    #TODO 处理301等情况
-
+                    #TODO 处理其他情况
                     raise httplib.HTTPException()
                 if headers.has_key('content-length'):
                     self.task.total_size = int(headers['content-length']) + self.task.completed_size
