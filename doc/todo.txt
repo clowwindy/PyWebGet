@@ -189,3 +189,4 @@ milestone：
 
 	bug修正：
 	    中文文件名
+	    解决database is locked问题
