@@ -334,6 +334,12 @@ class Controller(object):
         db.update('Task', where="id = %d" % a_task.id, date_completed = "%d" % time.time(),completed_size = "%d" % a_task.completed_size, total_size = "%d" % a_task.total_size, filename=a_task.filename)
         log("complete: "+a_task.url)
         self._close_db(db)
+        # rename filename
+        self.filename_lock.acquire()
+        try:
+            os.rename(a_task.partfilename, os.path.join(self.settings.download_path, a_task.filename))
+        finally:
+            self.filename_lock.release()
         self.update_event.set()
 
     def _get_filename_by_url(self, url):

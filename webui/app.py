@@ -46,8 +46,8 @@ class add_task:
         web.header('Content-Type', 'application/json')
         try:
             data = json.loads(web.data())
-            #TODO: 支持多个URL
-            controller.add_tasks(data['urls'].splitlines(), data['cookie'], data['referer'])
+            # remove empty lines, add tasks
+            controller.add_tasks(filter(None, data['urls'].splitlines()), data['cookie'], data['referer'])
             return '"OK"'
         except Exception, e:
             return json.dumps(unicode(e))
