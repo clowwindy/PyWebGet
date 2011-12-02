@@ -10,11 +10,3 @@ Author: %s
 Please send bug reports to: %s
 """ % (APP_NAME, VERSION, SHORT_DESCRIPTION, AUTHOR, EMAIL)
 
-USAGE = '''
-Usage:
-pywebget [options...]
--d  Run as daemon
--c <file> Specify which config file to read and write
--
-
-'''
