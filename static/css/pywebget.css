@@ -76,6 +76,10 @@ body {
 #download_list_table tr:hover td {
     background: #eaF0F4;
 }
+#download_list_table .download_tiem_icon {
+    width:17px;
+    height:17px;
+}
 .dialog {
     height: 2em;
 }

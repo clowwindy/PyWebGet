@@ -42,15 +42,15 @@
 
         function str_by_status(status) {
             if (status == STATUS_QUEUED)
-                return "Queued";
+                return "<img class='download_tiem_icon' title=Queued src='img/icons/clock.png' />";
             else if (status == STATUS_DOWNLOADING)
-                return "Downloading";
+                return "<img class='download_tiem_icon' title=Downloading src='img/icons/play.png' />";
             else if (status == STATUS_PAUSED)
-                return "Paused";
+                return "<img class='download_tiem_icon' title=Paused src='img/icons/pause.png' />";
             else if (status == STATUS_COMPLETED)
-                return "Completed";
+                return "<img class='download_tiem_icon' title=Completed src='img/icons/finish.png' />";
             else if (status == STATUS_FAILED)
-                return "Failed";
+                return "<img class='download_tiem_icon' title=Failed src='img/icons/delete.png' />";
             else
                 return "";
         }
@@ -330,7 +330,7 @@
                 oTable.fnDraw();
                 // select checkbox by click rows
                 $("#download_list_table tr td").unbind().click(function(e){
-                    if(e.target == this){
+                    if(e.target.tagName != 'INPUT'){
                         var checkbox = $(this).parent().find(":checkbox");
                         checkbox.prop('checked', !checkbox[0].checked);
                     }
