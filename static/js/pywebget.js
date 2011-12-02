@@ -316,6 +316,7 @@
                 all_same = false;
                 var rendered_row = render_row(row);
                 var index = find_table_row_by_id(id);
+                oTable.fnUpdate(rendered_row.filename, index, get_col_index_by_name('filename'), false, false);
                 oTable.fnUpdate(rendered_row.status, index, get_col_index_by_name('status'), false, false);
                 oTable.fnUpdate(rendered_row.completed_size, index, get_col_index_by_name('completed_size'), false, false);
                 oTable.fnUpdate(rendered_row.total_size, index, get_col_index_by_name('total_size'), false, false);

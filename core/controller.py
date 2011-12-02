@@ -26,14 +26,13 @@ class Controller(object):
     controller_thread = None
     threads = []
     tasks = []
-    thread_limit = 2
-    lock = threading.Lock()
+    tasklist_lock = threading.Lock()
+    filename_lock = threading.Lock()
     update_event = threading.Event()
     status = STATUS_RUNNING
 
     def __init__(self):
         self.settings = setting.load_settings()
-        self.thread_limit = self.settings.thread_limit
 
     def init(self):
         #检查db是否存在，如不存在复制一个
@@ -48,6 +47,7 @@ class Controller(object):
         #第一次启动时运行，将所有downloading修改为inqueue
         db = self._db()
         db.update('Task', where="status = %d" % task.STATUS_DOWNLOADING, status = "%d" % task.STATUS_QUEUED)
+        self._close_db(db)
  
     def update_tasks(self):
         #获取所有任务
@@ -57,7 +57,7 @@ class Controller(object):
 
         for a_task in tasks:
             if a_task.status == task.STATUS_QUEUED:
-                if task_running >= self.thread_limit:
+                if task_running >= self.settings.thread_limit:
                     if setting.DEBUG:
                         log("over limit")
                     break
@@ -65,11 +65,12 @@ class Controller(object):
                 self._update_task_status(db, task.STATUS_DOWNLOADING, a_task)
                 t = threading.Thread(target=self.run_task,args=(a_task,),name='task')
 #                t.setDaemon(True)
-                self.lock.acquire()
+                self.tasklist_lock.acquire()
                 self.threads.append(t)
-                self.lock.release()
+                self.tasklist_lock.release()
                 t.start()
                 task_running += 1
+        self._close_db(db)
 
     def run_task(self, a_task):
         if setting.DEBUG:
@@ -88,14 +89,15 @@ class Controller(object):
             ti.oncomplete = self._oncomplete
             ti.onerror = self._onerror
             ti.onupdating_total_size = self._onupdating_total_size
+            ti.onupdating_filename = self._onupdating_filename
             ti.onstatus_change = self._onstatus_change
             ti.download()
         finally:
-            self.lock.acquire()
+            self.tasklist_lock.acquire()
             if ti:
                 self.tasks.remove(ti)
             self.threads.remove(thread)
-            self.lock.release()
+            self.tasklist_lock.release()
             if setting.DEBUG:
                 log("download thread stopped")
 
@@ -137,6 +139,7 @@ class Controller(object):
                       date_created=time.time())
             if set_update_event:
                 self.update_event.set()
+            self._close_db(db)
             log("add task: "+url)
         else:
             log("add task: URL is not valid:: "+url)
@@ -157,6 +160,7 @@ class Controller(object):
                     a_task_1.event.set()
                     db.update('Task', where="id = %d" % task_id, completed_size = "%d" % a_task_1.completed_size)
                     a_task_1.thread.join(timeout=TASK_STOP_TIMEOUT)
+        self._close_db(db)
                 
     def resume_task(self, a_task, set_update_event = True):
         task_id = a_task
@@ -172,6 +176,7 @@ class Controller(object):
 #                    a_task_1.task.status = task.STATUS_QUEUED
             if set_update_event:
                 self.update_event.set()
+        self._close_db(db)
 
     def remove_task(self, a_task):
         task_id = a_task
@@ -189,6 +194,7 @@ class Controller(object):
             # 直接删除
             db.delete('Task',  where="id = %d" % task_id)
             log("deleted: " + str(task_id))
+        self._close_db(db)
 
     def add_tasks(self, urls,cookie="",referer=""):
         try:
@@ -214,6 +220,7 @@ class Controller(object):
     def task_list(self):
         db = self._db()
         tasks = db.select('Task', where="status <> %d" % task.STATUS_DELETED).list()
+        self._close_db(db)
         #合并速度和进度信息
         for a_task in tasks:
             found = False
@@ -229,7 +236,23 @@ class Controller(object):
         return tasks
     
     def _db(self):
+#        try:
+#            if threading.currentThread().__getattribute__('ctl_db'):
+#                return threading.currentThread().__getattribute__('ctl_db')
+#        except AttributeError:
+#            db = web.database(dbn='sqlite', db=DB_NAME)
+#            threading.currentThread().__setattr__('ctl_db',db)
+#            return db
         return web.database(dbn='sqlite', db=DB_NAME)
+
+    def _close_db(self,db):
+#        try:
+#            if threading.currentThread().__getattribute__('ctl_db'):
+#                threading.currentThread().__getattribute__('ctl_db').ctx.get('db').close()
+#                threading.currentThread().__delattr__('ctl_db')
+#        except AttributeError:
+#            pass
+        db.ctx.get('db').close()
 
     def _update_task_status(self, db, status, a_task):
         task_id = a_task
@@ -247,6 +270,7 @@ class Controller(object):
         db = self._db()
         self._update_task_status(db, task.STATUS_FAILED, a_task)
         db.update('Task', where="id = %d" % a_task.id, completed_size = "%d" % a_task.completed_size, filename=a_task.filename)
+        self._close_db(db)
         log("error %s: %s" % (error_code, a_task.url))
 
     def _onstatus_change(self, a_task):
@@ -254,25 +278,62 @@ class Controller(object):
             log("deleted: "+a_task.url)
             db = self._db()
             db.delete('Task',  where="id = %d" % a_task.id)
+            self._close_db(db)
         else:
             if setting.DEBUG:
                 log("status changed: "+a_task.url + " " + str(a_task.status))
             db = self._db()
             db.update('Task', where="id = %d" % a_task.id, completed_size = "%d" % a_task.completed_size, filename=a_task.filename)
+            self._close_db(db)
 
 
     def _onupdating_total_size(self, a_task):
         db = self._db()
         db.update('Task', where="id = %d" % a_task.id, total_size = "%d" % a_task.total_size, filename=a_task.filename)
+        self._close_db(db)
+#        db.ctx.get('db').close()
 
+    def _onupdating_filename(self, a_task, filename):
+        self.filename_lock.acquire()
+        download_path = self.settings.download_path
+        try:
+            i = -1
+            while True:
+                i += 1
+                if i > 0:
+                    fileext = os.path.splitext(filename)
+                    filename_to_test = "%s (%d)%s" % (fileext[0], i, fileext[1])
+                else:
+                    filename_to_test = filename
+                # filename not in download path
+                if os.path.exists(os.path.join(download_path, filename_to_test)):
+                    continue
+                # partfilename not in download path
+                partfilename_to_test = os.path.join(download_path, filename_to_test + ".part")
+                if os.path.exists(partfilename_to_test):
+                    continue
+                # filename or partfilenaem not in database
+                db = self._db()
+                results = db.query("SELECT count(*) as count FROM Task WHERE id <> $id and (filename=$filename or partfilename=$partfilename) and status <> $completed and status <> $deleted",
+                    vars={'id':a_task.id, 'filename':filename_to_test, 'partfilename':partfilename_to_test, 'completed':task.STATUS_COMPLETED,'deleted':task.STATUS_DELETED})
+                if int(results[0]['count']) > 0:
+                    self._close_db(db)
+                    continue
+                a_task.task.filename = filename_to_test
+                a_task.task.partfilename = partfilename_to_test
+                db.update('Task', filename = filename_to_test, partfilename = partfilename_to_test)
+                self._close_db(db)
+                break
+        finally:
+            self.filename_lock.release()
         
     def _oncomplete(self, a_task):
         db = self._db()
         self._update_task_status(db, task.STATUS_COMPLETED, a_task)
         db.update('Task', where="id = %d" % a_task.id, date_completed = "%d" % time.time(),completed_size = "%d" % a_task.completed_size, total_size = "%d" % a_task.total_size, filename=a_task.filename)
         log("complete: "+a_task.url)
+        self._close_db(db)
         self.update_event.set()
-
 
     def _get_filename_by_url(self, url):
         try:

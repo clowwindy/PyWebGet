@@ -33,6 +33,7 @@ def str_by_status(status):
     elif status == STATUS_COMPLETED:
         return "Completed"
 
+
 class Task(object):
     task_id = -1
     retry_count = 0
@@ -45,6 +46,9 @@ class Task(object):
     oncomplete = None
     onstatus_change = None
     onupdating_total_size = None
+    onupdating_filename = None
+    # input: task, filename(without dir) output: None. change task.filename and task.partfilename
+
     event = threading.Event()
 
     def __getattr__(self, key):
@@ -56,8 +60,22 @@ class Task(object):
     def __init__(self, task):
         self.task = task
 
+    def _filename_from_content_disposition(self, content_disposition):
+        # rfc2183
+        disposition = content_disposition.split(';')
+        for i in xrange(1, len(disposition)):
+            disposition_parm = disposition[i].split('=')
+            if len(disposition_parm) > 1 and disposition_parm[0].strip() == 'filename':
+                filename = urllib2.unquote(disposition_parm[1])
+                if len(filename) > 0:
+                    return filename
+                else:
+                    break
+        return None
+
     def download(self):
         # handle errors, and retry
+        is_continue_downloading = False
         url = self.task.url
         while self.task.status == STATUS_DOWNLOADING:
             self.retry_count += 1
@@ -71,14 +89,21 @@ class Task(object):
                 if not os.access(self.download_path, os.X_OK):
                     os.makedirs(self.download_path)
 
-                filename = os.path.join(self.download_path, self.task.filename)
-                if os.path.exists(filename):
-                    cur_length = os.path.getsize(filename)
+                partfilename = None
+                if self.task.partfilename:
+                    partfilename = os.path.join(self.download_path, self.task.partfilename)
+                    if os.access(partfilename, os.W_OK):
+                        is_continue_downloading = True
+
+                    #                filename = os.path.join(self.download_path, self.task.filename)
+                if is_continue_downloading:
+                    if os.path.exists(partfilename):
+                        cur_length = os.path.getsize(partfilename)
 
                 request = urllib2.Request(url)
 
                 if cur_length > 0:
-                    range = "bytes=%d-"%(cur_length,)
+                    range = "bytes=%d-" % (cur_length,)
                     request.add_header("Range", range)
 
                 cookie = self.task.cookie
@@ -90,7 +115,7 @@ class Task(object):
                     request.add_header("Referer", referer)
 
                 opener = urllib2.build_opener()
-                netfile = opener.open(request, timeout = self.timeout)
+                netfile = opener.open(request, timeout=self.timeout)
                 headers = netfile.headers.dict
 
                 should_append = False
@@ -112,19 +137,31 @@ class Task(object):
                     self.task.total_size = int(headers['content-length']) + self.task.completed_size
                     if self.onupdating_total_size:
                         self.onupdating_total_size(self)
+                if not is_continue_downloading:
+                    filename = self.task.filename
+                    # 处理content-disposition Header，更新文件名
+                    if headers.has_key('content-disposition'):
+                        filename_from_content_disposition = self._filename_from_content_disposition(headers['content-disposition'])
+                        if filename_from_content_disposition:
+                            filename = filename_from_content_disposition
+                    # 检查文件是否已经存在，如果存在，后面添加序号
+                    if self.onupdating_filename:
+                        self.onupdating_filename(self, filename)
+                        partfilename = self.task.partfilename
+                    else:
+                        partfilename = self.task.filename + ".part"
+                        self.task.partfilename = partfilename
 
                 if should_append:
                     self.task.completed_size = cur_length
-                    f = open(filename,'ab',BUF_SIZE)
+                    f = open(partfilename, 'ab', BUF_SIZE)
                 else:
                     cur_length = self.task.completed_size = 0
-                    f = open(filename,'wb',BUF_SIZE)
+                    f = open(partfilename, 'wb', BUF_SIZE)
 
                 data = netfile.read(CHUNK_SIZE)
 
                 self.task.completed_size = cur_length
-
-                # TODO 处理content-disposition Header，更新文件名
 
                 # Download
                 while data and self.task.status == STATUS_DOWNLOADING:
@@ -160,6 +197,7 @@ class Task(object):
                     return
             except socket.timeout:
                 import traceback
+
                 traceback.print_exc()
 
                 if self.retry_count > self.retry_limit:
@@ -168,6 +206,7 @@ class Task(object):
                     return
             except Exception:
                 import traceback
+
                 traceback.print_exc()
 
                 if self.retry_count > self.retry_limit:

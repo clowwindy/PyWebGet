@@ -11,6 +11,7 @@ CREATE TABLE "Task" (
 "url"  TEXT NOT NULL,
 "status"  INTEGER NOT NULL DEFAULT 0,
 "filename"  TEXT,
+"partfilename"  TEXT,
 "dir"  TEXT,
 "cookie"  TEXT,
 "referer"  TEXT,
