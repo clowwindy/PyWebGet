@@ -179,6 +179,8 @@ class Task(object):
                     f.write(data)
                     data = netfile.read(CHUNK_SIZE)
                 f.flush()
+                f.close()
+                netfile.close()
 
                 complete = True
 
