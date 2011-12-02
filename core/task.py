@@ -74,6 +74,10 @@ class Task(object):
                     break
         return None
 
+    def _mime_type_fron_content_type(self, content_type):
+        #rfc2616
+        return content_type.split(';')[0]
+
     def download(self):
         # handle errors, and retry
         is_continue_downloading = False
@@ -142,13 +146,17 @@ class Task(object):
                 if not is_continue_downloading:
                     filename = self.task.filename
                     # 处理content-disposition Header，更新文件名
+                    content_type = None
                     if headers.has_key('content-disposition'):
                         filename_from_content_disposition = self._filename_from_content_disposition(headers['content-disposition'])
                         if filename_from_content_disposition:
                             filename = filename_from_content_disposition
+                    elif headers.has_key('content-type'):
+                        # guess extension by content-type only when there is no content-disposition header
+                        content_type = headers['content-type']
                     # 检查文件是否已经存在，如果存在，后面添加序号
                     if self.onupdating_filename:
-                        self.onupdating_filename(self, filename)
+                        self.onupdating_filename(self, filename, self._mime_type_fron_content_type(content_type))
                         partfilename = self.task.partfilename
                     else:
                         partfilename = self.task.filename + ".part"

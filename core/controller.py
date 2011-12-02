@@ -3,7 +3,7 @@
 __author__ = 'clowwindy'
 
 import web, task, threading, types, time, urllib, os
-from utils import log
+from utils import log, guess_extension_from_mime_type
 import setting
 
 if os.name == 'posix':
@@ -293,9 +293,16 @@ class Controller(object):
         self._close_db(db)
 #        db.ctx.get('db').close()
 
-    def _onupdating_filename(self, a_task, filename):
+    def _onupdating_filename(self, a_task, filename, mime_type=None):
         self.filename_lock.acquire()
         download_path = self.settings.download_path
+        # guess content-type if there is no content-disposition and there is no extension in the filename
+        if mime_type:
+            fileext = os.path.splitext(filename)
+            if not fileext[1]:
+                ext = guess_extension_from_mime_type(mime_type)
+                if ext:
+                    filename += ext
         try:
             i = -1
             while True:
