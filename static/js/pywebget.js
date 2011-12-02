@@ -151,8 +151,8 @@
                     "sEmptyTable": "Click Add button to add tasks."
                 },
                 "aLengthMenu": [
-                    [25, 50, 100, -1],
-                    [25, 50, 100, "All"]
+                    [10, 50, 100, -1],
+                    [10, 50, 100, "All"]
                 ],
                 "aoColumns": columns
             });
@@ -269,7 +269,7 @@
                 id:row.id,
                 checkbox:"<input type='checkbox' class='taskid_checkbox' taskid='" + row.id + "' />",
                 status:str_by_status(row.status),
-                filename:html_encode(row.filename),
+                filename:"<span title='"+html_encode(row.url)+"'>"+html_encode(row.filename)+"</span>" ,
                 dir:html_encode(row.dir),
                 total_size:readablize_bytes(row.total_size),
                 percent:percent,
