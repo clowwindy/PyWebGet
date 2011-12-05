@@ -4,7 +4,7 @@ test -f /usr/bin/pywebget && rm -f /usr/bin/pywebget
 ln -s /opt/pywebget/pywebget /usr/bin/pywebget
 
 if ! getent passwd debian-pywebget >/dev/null; then
-    useradd debian-pywebget --system --no-create-home --user-group --home-dir /var/run/debian-pywebget -s /usr/sbin/nologin
+    useradd debian-pywebget --system --user-group --home-dir /var/run/debian-pywebget -s /usr/sbin/nologin
 fi
 
 ! test -d /etc/pywebget && mkdir /etc/pywebget
