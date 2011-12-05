@@ -68,18 +68,20 @@ def save_settings(settings):
 
 def check_paths():
     if os.name == 'posix':
-        if not os.access(os.path.dirname(SETTING_FILE),os.X_OK):
-            try:
-                os.makedirs(os.path.dirname(SETTING_FILE))
-            except Exception:
-                log('invalid setting file path')
-                import sys
-                sys.exit(1)
+        if os.path.dirname(SETTING_FILE):
+            if not os.access(os.path.dirname(SETTING_FILE),os.X_OK):
+                try:
+                    os.makedirs(os.path.dirname(SETTING_FILE))
+                except Exception:
+                    log('invalid setting file path')
+                    import sys
+                    sys.exit(1)
         import controller
-        if not os.access(os.path.dirname(controller.DB_NAME),os.X_OK):
-            try:
-                os.makedirs(os.path.dirname(controller.DB_NAME))
-            except Exception:
-                log('invalid database file path')
-                import sys
-                sys.exit(1)
+        if os.path.dirname(controller.DB_NAME):
+            if not os.access(os.path.dirname(controller.DB_NAME),os.X_OK):
+                try:
+                    os.makedirs(os.path.dirname(controller.DB_NAME))
+                except Exception:
+                    log('invalid database file path')
+                    import sys
+                    sys.exit(1)

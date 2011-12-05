@@ -1,6 +1,7 @@
 __author__ = 'clowwindy'
 
-import argparse, os
+import os
+from thr import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-V', '--version', action='version')

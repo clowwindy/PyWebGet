@@ -76,7 +76,9 @@ class Task(object):
 
     def _mime_type_fron_content_type(self, content_type):
         #rfc2616
-        return content_type.split(';')[0]
+        if content_type:
+            return content_type.split(';')[0]
+        return None
 
     def download(self):
         # handle errors, and retry

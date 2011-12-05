@@ -25,6 +25,10 @@ argparse
 http://code.google.com/p/argparse/
 License: Python Software Foundation License
 
+shlex
+From Python standard library, modified to be able to handle unicode
+Python Software Foundation License
+
 DataTable
 http://www.datatables.net/
 DataTables is dual licensed under the GPL v2 license or a BSD (3-point) license.

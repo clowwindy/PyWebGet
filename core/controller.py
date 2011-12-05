@@ -4,7 +4,7 @@ __author__ = 'clowwindy'
 
 import web, task, threading, types, time, urllib, os
 from utils import log, guess_extension_from_mime_type
-import setting
+import setting, wget_parser
 
 if os.name == 'posix':
     DB_NAME = os.path.expanduser('~/.pywebget/db.sqlite')
@@ -128,14 +128,20 @@ class Controller(object):
         #TODO: 更新具体的设置
         self.update_event.set()
 
-    def add_task(self, url, cookie="", referer = "", set_update_event = True):
+    def add_task(self, url, cookie="", referer = "", filename=None, set_update_event = True):
         import re
+        if url.startswith('wget'):
+            (url, cookie, referer, filename) = wget_parser.parse_args(url)
+        if url.startswith('mkdir'):
+            return
         if re.match(r"[^:]+://[^/]+/?([^?#]*)",url):
             db = self._db()
+            if not filename:
+                filename=self._get_filename_by_url(url)
             db.insert('Task', url=url,
                       cookie=cookie,
                       referer=referer,
-                      filename=self._get_filename_by_url(url),
+                      filename=filename,
                       date_created=time.time())
             if set_update_event:
                 self.update_event.set()
@@ -197,12 +203,18 @@ class Controller(object):
         self._close_db(db)
 
     def add_tasks(self, urls,cookie="",referer=""):
+        invalid_urls = 0
         try:
             for a_url in urls:
-                self.add_task(a_url,cookie=cookie,referer=referer,set_update_event=False)
+                try:
+                    self.add_task(a_url,cookie=cookie,referer=referer,set_update_event=False)
+                except AssertionError:
+                    invalid_urls += 1
         finally:
             #if an error is raised when one of the urls is valid, set event before leaving
             self.update_event.set()
+        if invalid_urls > 0:
+            raise AssertionError("%d URLs are invalid" % invalid_urls)
 
     def pause_tasks(self, tasks):
         for a_task in tasks:

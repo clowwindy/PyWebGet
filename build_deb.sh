@@ -20,12 +20,12 @@ mkdir -p build/$name$install_path
 cp -r core build/$name$install_path
 cp -r share build/$name$install_path
 cp -r simplejson build/$name$install_path
+cp -r thr build/$name$install_path
 cp -r static build/$name$install_path
 cp -r web build/$name$install_path
 cp -r webui build/$name$install_path
 cp -r core build/$name$install_path
 cp pywebget.py build/$name$install_path/pywebget
-cp argparse.py build/$name$install_path
 cp LICENSE build/$name$install_path
 cp README build/$name$install_path
 

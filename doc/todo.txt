@@ -163,6 +163,7 @@ milestone：
 		Cookie，Referrer OK
 		自动设置文件名（后面加1 2 3……） OK
 		未完成文件加.part     OK
+		parse wget命令    OK
 		处理重定向
 		相对目录
 		调整顺序

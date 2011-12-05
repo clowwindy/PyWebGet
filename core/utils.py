@@ -26,6 +26,8 @@ _common_mime_types = {
     }
 
 def guess_extension_from_mime_type(mime_type):
-    if _common_mime_types.has_key(mime_type):
-        return _common_mime_types[mime_type]
-    return mimetypes.guess_extension(mime_type)
+    if mime_type:
+        if _common_mime_types.has_key(mime_type):
+            return _common_mime_types[mime_type]
+        return mimetypes.guess_extension(mime_type)
+    return None
