@@ -23,6 +23,7 @@ def parse_args(param_string):
     parser.add_argument('-o','--output-file')
     parser.add_argument('--header')
     parser.add_argument('--referer')
+    parser.add_argument('-t')
     parser.add_argument('url', metavar='N', nargs=1)
     args = parser.parse_known_args(params)[0]
 
