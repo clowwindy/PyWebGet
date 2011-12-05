@@ -3,7 +3,7 @@ Version: 0.1
 Section: net
 Priority: optional
 Maintainer: clowwindy <clowwindy42@gmail.com>
-Homepage: https://github.com/clowwindy
+Homepage: https://github.com/clowwindy/PyWebGet
 Architecture: all
 Depends: python(>= 2.5), python (<< 2.8)
 Conflicts: pywebget
