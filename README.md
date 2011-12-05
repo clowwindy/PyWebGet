@@ -5,7 +5,7 @@ A background HTTP download manager with a web interface.
  Python 2.6 ~ Python 2.7, Unix/Linux or Windows.
 
 ## Install
- Just copy all the files to the path you want. Then run `./pywebget.py`. Open your browser, open [http://localhost:8090/]. The default username is admin with a blank password.
+ Just copy all the files to the path you want. Then run `./pywebget.py`. Open your browser, open [http://localhost:8090/](http://localhost:8090/). The default username is admin with a blank password.
 
  The default download directory on Liunx is `/tmp`. You may want to change this in the preferences window. Click the preferences button on the toolbar, a window will popup.
 
