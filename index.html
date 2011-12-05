@@ -8,20 +8,20 @@
   <style type="text/css">
     body {
       margin-top: 1.0em;
-      background-color: #0b3075;
+      background-color: #ffffff;
       font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #ffffff;
+      color: #222222;
     }
     #container {
       margin: 0 auto;
       width: 700px;
     }
-    h1 { font-size: 3.8em; color: #f4cf8a; margin-bottom: 3px; }
+    h1 { font-size: 3.8em; color: #248; margin-bottom: 3px; }
     h1 .small { font-size: 0.4em; }
     h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #f4cf8a; }
-    h3 { text-align: center; color: #f4cf8a; }
-    a { color: #f4cf8a; }
+    h2 { font-size: 1.5em; color: #248; }
+    h3 { text-align: center; color: #248; }
+    a { color: #248; }
     .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
     .download { float: right; }
     pre { background: #000; color: #fff; padding: 15px;}
@@ -42,112 +42,41 @@
         <img border="0" width="90" src="https://github.com/images/modules/download/tar.png"></a>
     </div>
 
-    <h1><a href="https://github.com/clowwindy/PyWebGet">PyWebGet</a>
-      <span class="small">by <a href="https://github.com/clowwindy">clowwindy</a></span></h1>
-
-    <div class="description">
-      a background HTTP download manager with a web interface
-    </div>
-
-    
-
-    
-      <h2>Dependencies</h2>
+      <h1><a href="https://github.com/clowwindy/PyWebGet" title="PyWebGet Homepage">PyWebGet</a></h1>
+      <p>A background HTTP download manager with a web interface.</p>
+      <h2>Dependency</h2>
       <p>Python 2.6 ~ Python 2.7, Unix/Linux or Windows.</p>
-    
-
-    
       <h2>Install</h2>
-      <p>## Install
- Just copy all the files to the path you want. Then run `./pywebget.py`. Open your browser, open [http://localhost:8090/](http://localhost:8090/). The default username is admin with a blank password.
+      <p>Just copy all the files to the path you want. Then run <code>./pywebget.py</code>. Open your browser, open <a href="http://localhost:8090/">http://localhost:8090/</a>. The default username is admin with a blank password.</p>
+      <p>The default download directory on Liunx is <code>/tmp</code>. You may want to change this in the preferences window. Click the preferences button on the toolbar, a window will popup.</p>
 
- The default download directory on Liunx is `/tmp`. You may want to change this in the preferences window. Click the preferences button on the toolbar, a window will popup.
+      <p>For more information, run <code>./pywebget.py -h</code></p>
+      <h2>Config PyWebGet</h2>
+      <p>Typically the config file is saved to ~/.pywebget/settings.json on Linux.</p>
+      <p>You may want to change username and password of the web UI. The password will be hashed before saving to the disk. You can just replace it with a new password(please don't use {} in your password).</p>
+      <h2>Debian</h2>
+      <p>Debian or Ubuntu users may want to install PyWebGet as a Debian package.
+       To build a deb file, use build_deb.sh.</p>
+      <pre><code>sudo ./build_deb.sh
+      sudo dpkg -i build/pywebget-0.1.deb
+      </code></pre>
+      <p>Now, you have a pywebget service. You can control the service via the following commands:</p>
 
- For more information, run `./pywebget.py -h`
-
-## Config PyWebGet
- Typically the config file is saved to ~/.pywebget/settings.json on Linux.
-
- You may want to change username and password of the web UI. The password will be hashed before saving to the disk. You can just replace it with a new password(please don't use {} in your password).
-
-## Debian
- Debian or Ubuntu users may want to install PyWebGet as a Debian package.
- To build a deb file, use build_deb.sh.
-
-    sudo ./build_deb.sh
-    sudo dpkg -i build/pywebget-0.1.deb
-
- Now, you have a pywebget service. You can control the service via the following commands:
-
-    sudo /etc/init.d/pywebget start
-    sudo /etc/init.d/pywebget stop
-
- The config file is saved at `/etc/pywebget/settings.json`</p>
-    
-
-    
-      <h2>License</h2>
-      <p>PyWebGet
-Created by Clowwindy
-PyWebGet is dual licensed under the GPL v2 license or a BSD (3-point) license.
-
-This software is built with these software and artworks:
-
-jQuery
-http://jquery.com/
-MIT License
-GPL
-
-jQuery UI
-http://jqueryui.com/
-Dual licensed under the MIT or GPL Version 2 licenses.
-
-Webpy
-http://webpy.org/
-web.py is a web framework for Python that is as simple as it is powerful. web.py is in the public domain; you can use it for whatever purpose with absolutely no restrictions.
-
-simplejson
-http://pypi.python.org/pypi/simplejson/
-MIT License
-
-argparse
-http://code.google.com/p/argparse/
-License: Python Software Foundation License
-
-shlex
-From Python standard library, modified to be able to handle unicode
-Python Software Foundation License
-
-DataTable
-http://www.datatables.net/
-DataTables is dual licensed under the GPL v2 license or a BSD (3-point) license.
-
-Datejs
-http://www.datejs.com/
-MIT License
-
-Free icons by App-bits
-http://www.app-bits.com/free-icons.html
-You can use these icons completely free in your commercial or non-commercial apps as long as you put a link to app-bits somewhere in your application. They are licensed under a Creative Commons Attribution-No Derivative Works 3.0 License. So please don't edit the icons in any way without permission.
-
-Dusseldorf Icons
-http://pc.de/icons/#Dusseldorf
-Creative Commons Attribution 3.0 License.
-
-Aristo-jQuery-UI-Theme
-https://github.com/taitems/Aristo-jQuery-UI-Theme
-The “Aristo” theme for Cappuccino ported to a jQuery UI Theme, with permission by 280North and Pinvoke.
-</p>
-    
+      <pre><code>sudo /etc/init.d/pywebget start
+      sudo /etc/init.d/pywebget stop
+      </code></pre>
+      <p>The config file is saved at <code>/etc/pywebget/settings.json</code></p>
 
     
       <h2>Authors</h2>
-      <p>clowwindy (clowwindy42@gmail.com)<br/>      </p>
+      <p>clowwindy (clowwindy42@gmail.com)
+<br/>      </p>
     
 
     
       <h2>Contact</h2>
-      <p>clowwindy (clowwindy42@gmail.com)<br/>      </p>
+      <p>clowwindy (clowwindy42@gmail.com)
+<br/>      </p>
     
 
     <h2>Download</h2>
