@@ -49,7 +49,7 @@ def start(pidfile,username=None):
     pid = get_pid(pidfile)
     if pid != 0 and pid_exists(pid):
         log("daemon pid %d is already running" % pid)
-        sys.exit(0)
+        sys.exit(1)
     pid = os.fork()
     if pid:
         log("daemon pid %d started" % pid)
@@ -91,24 +91,30 @@ def stop(pidfile, exit=True):
             os.remove(pidfile)
             import time
             for i in xrange(0,10):
-                time.sleep(0.5)
+                time.sleep(0.1)
                 if not pid_exists(pid):
                     break
             if pid_exists(pid):
                 log("failed to stop timeout")
+                result = False
             else:
                 log("daemon pid %d stopped" % pid)
         except OSError:
             log("failed to stop daemon")
+            result = False
     else:
         log("can't find daemon pid file")
+        result = False
     if exit:
-        sys.exit(0)
+        if result:
+            sys.exit(0)
+        else:
+            sys.exit(1)
     else:
         return result
 
 def restart(pidfile,username=None):
     if pidfile is None:
         pidfile = DEFAULT_PID_FILE
-    if stop(pidfile, False):
-        start(pidfile,username)
+    stop(pidfile, False)
+    start(pidfile,username)
