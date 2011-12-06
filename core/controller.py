@@ -3,7 +3,7 @@
 __author__ = 'clowwindy'
 
 import web, task, threading, types, time, urllib, os
-from utils import log, guess_extension_from_mime_type
+from utils import log, guess_extension_from_mime_type, url_decode
 import setting, wget_parser
 
 if os.name == 'posix':
@@ -367,7 +367,7 @@ class Controller(object):
             result = re.match(r"[^:]+://[^/]+/?([^?#]*)",url).groups()[0]
             result = result.split('/')[-1]
             if result:
-                return urllib.unquote(result)
+                return url_decode(result)
             else:
                 return "download"
         except Exception:

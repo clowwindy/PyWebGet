@@ -1,6 +1,8 @@
 # -*- coding:utf-8 -*-
 import time
 import mimetypes
+import urllib
+import codecs
 
 __author__ = 'clowwindy'
 
@@ -31,3 +33,20 @@ def guess_extension_from_mime_type(mime_type):
             return _common_mime_types[mime_type]
         return mimetypes.guess_extension(mime_type)
     return None
+
+def detect_encoding(input):
+    from thr.chardet import universaldetector
+    detector = universaldetector.UniversalDetector()
+    detector.reset()
+    detector.feed(input)
+    detector.close()
+    if detector.result and detector.result['confidence'] > 0.5:
+        return detector.result['encoding']
+    return 'utf-8'
+
+def url_decode(input,encoding=None):
+    result = urllib.unquote(input.encode('ascii', 'ignore'))
+    if not encoding:
+        # detect encoding if encoding is not specified
+        encoding = detect_encoding(result)
+    return codecs.decode(result, encoding, 'ignore')

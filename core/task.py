@@ -6,7 +6,7 @@ import threading
 import httplib
 import urlparse
 import setting
-from utils import log
+from utils import log, url_decode
 
 __author__ = 'clowwindy'
 
@@ -67,7 +67,7 @@ class Task(object):
         for i in xrange(1, len(disposition)):
             disposition_parm = disposition[i].split('=')
             if len(disposition_parm) > 1 and disposition_parm[0].strip() == 'filename':
-                filename = urllib2.unquote(disposition_parm[1].strip('"'))
+                filename = url_decode(disposition_parm[1].strip('"'))
                 if len(filename) > 0:
                     return filename
                 else:

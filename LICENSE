@@ -29,6 +29,10 @@ shlex
 From Python standard library, modified to be able to handle unicode
 Python Software Foundation License
 
+chardet
+http://pypi.python.org/pypi/chardet
+LGPL
+
 DataTable
 http://www.datatables.net/
 DataTables is dual licensed under the GPL v2 license or a BSD (3-point) license.
