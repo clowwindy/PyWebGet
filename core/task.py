@@ -171,6 +171,9 @@ class Task(object):
                     cur_length = self.task.completed_size = 0
                     f = open(partfilename, 'wb', BUF_SIZE)
 
+                if os.name == "posix":
+                    os.chmod(partfilename,0666)
+
                 data = netfile.read(CHUNK_SIZE)
 
                 self.task.completed_size = cur_length
