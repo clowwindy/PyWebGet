@@ -25,11 +25,11 @@
             { "mDataProp": "status" },
             { "mDataProp": "filename" },
             { "mDataProp": "dir" },
-            { "mDataProp": "total_size" },
-            { "mDataProp": "percent" },
-            { "mDataProp": "speed" },
+            { "mDataProp": "total_size", "sType": "file-size" },
+            { "mDataProp": "percent", "sType": "progress" },
+            { "mDataProp": "speed", "sType": "numeric" },
             { "mDataProp": "eta" },
-            { "mDataProp": "completed_size" },
+            { "mDataProp": "completed_size", "sType": "file-size" },
             { "mDataProp": "date_created" },
             { "mDataProp": "date_completed" }
         ];
@@ -39,6 +39,33 @@
                 return 'html';
             }
         );
+
+        function init_datatable_plugins(){
+            jQuery.fn.dataTableExt.oSort['file-size-asc']  = function(a,b) {
+                var x = bytes_by_readable(a);
+                var y = bytes_by_readable(b);
+                return ((x < y) ? -1 : ((x > y) ?  1 : 0));
+            };
+
+            jQuery.fn.dataTableExt.oSort['file-size-desc'] = function(a,b) {
+                var x = bytes_by_readable(a);
+                var y = bytes_by_readable(b);
+                return ((x < y) ?  1 : ((x > y) ? -1 : 0));
+            };
+
+            jQuery.fn.dataTableExt.oSort['progress-asc'] = function(a,b) {
+                var x = progress_by_html(a);
+                var y = progress_by_html(b);
+                return ((x < y) ? -1 : ((x > y) ?  1 : 0));
+
+            }
+            jQuery.fn.dataTableExt.oSort['progress-desc'] = function(a,b) {
+                var x = progress_by_html(a);
+                var y = progress_by_html(b);
+                return ((x < y) ?  1 : ((x > y) ? -1 : 0));
+
+            }
+        }
 
         function str_by_status(status) {
             if (status == STATUS_QUEUED)
@@ -64,6 +91,24 @@
             return (bytes/Math.pow(1024, Math.floor(e))).toFixed(2)+" "+s[e];
         }
 
+        function bytes_by_readable(readable) {
+            var s = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'DB', 'NB'];
+            var re=/([\d\.]*)\s*(\w+)/;
+            var result = re.exec(readable);
+            if(result.length == 0) {
+                return 0;
+            }
+            return parseFloat(result[1]) * Math.pow(1024,s.indexOf(result[2]));
+        }
+
+        function progress_by_html(html) {
+            var re = /(\d+)*%/;
+            var result = re.exec(html);
+            if(result.length>1){
+                return +result[1];
+            }
+            return 0;
+        }
 
         function timestamp_repr(t) {
             if(t == 0) {
@@ -342,6 +387,7 @@
         }
 
         $(function() {
+            init_datatable_plugins();
             init_table();
         //    reload_data();
         //    reload_preferences();

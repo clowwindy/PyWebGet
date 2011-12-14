@@ -684,15 +684,15 @@
 		 */
 		"numeric-asc": function ( a, b )
 		{
-			var x = (a=="-" || a==="") ? 0 : a*1;
-			var y = (b=="-" || b==="") ? 0 : b*1;
+			var x = (a=="-" || a==="") ? 0 : parseFloat(a);
+			var y = (b=="-" || b==="") ? 0 : parseFloat(b);
 			return x - y;
 		},
 		
 		"numeric-desc": function ( a, b )
 		{
-			var x = (a=="-" || a==="") ? 0 : a*1;
-			var y = (b=="-" || b==="") ? 0 : b*1;
+			var x = (a=="-" || a==="") ? 0 : parseFloat(a);
+			var y = (b=="-" || b==="") ? 0 : parseFloat(b);
 			return y - x;
 		}
 	};
