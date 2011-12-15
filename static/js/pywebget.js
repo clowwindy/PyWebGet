@@ -196,9 +196,10 @@
                     "sEmptyTable": "Click Add button to add tasks."
                 },
                 "aLengthMenu": [
-                    [10, 50, 100, -1],
-                    [10, 50, 100, "All"]
+                    [ -1, 10, 50, 100],
+                    ["All", 10, 50, 100]
                 ],
+                "iDisplayLength": -1,
                 "aoColumns": columns
             });
             $("div.toolbar").prepend($("#toolbar"));
@@ -335,7 +336,16 @@
             return -1;
         }
 
+        function save_scroll_pos() {
+            this.scroll_pos = $('.dataTables_scrollBody').scrollTop();
+        }
+
+        function load_scroll_pos() {
+            $('.dataTables_scrollBody')[0].scrollTop=this.scroll_pos;
+        }
+
         function reload_table() {
+            save_scroll_pos();
             var all_same = true;
             //和旧数据对比，看看哪些少了，删除
             callback_on_complement(instance.old_data, instance.data, function(id) {
@@ -383,6 +393,8 @@
                 });
                 $(":checkbox").unbind().change(update_button_state);
                 update_button_state();
+                // restore scroll position
+                load_scroll_pos();
             }
         }
 
@@ -421,7 +433,12 @@
             $("#resume").click(resume_tasks);
             $("#remove").click(remove_tasks);
             $("#preferences").click(show_preferences_dialog);
-            setInterval(reload_data, RELOAD_INTERVAL);
+            setInterval((function(){
+                var that = instance;
+                return function(){
+                    reload_data.call(that);
+                };
+            })(), RELOAD_INTERVAL);
         });
 
         function update_button_state() {

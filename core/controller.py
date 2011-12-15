@@ -105,7 +105,10 @@ class Controller(object):
         self.controller_thread = threading.currentThread()
         self.status = STATUS_RUNNING
         while self.status == STATUS_RUNNING:
-            self.update_tasks()
+            try:
+                self.update_tasks()
+            except Exception as e:
+                log(unicode(e))
             self.update_event.clear()
             self.update_event.wait(CHECK_INTERVAL)
         if setting.DEBUG:
