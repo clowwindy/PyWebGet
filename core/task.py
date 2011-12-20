@@ -80,6 +80,18 @@ class Task(object):
             return content_type.split(';')[0]
         return None
 
+    def _get_filename_by_url(self, url):
+        try:
+            import re
+            result = re.match(r"[^:]+://[^/]+/?([^?#]*)",url).groups()[0]
+            result = result.split('/')[-1]
+            if result:
+                return url_decode(result)
+            else:
+                return "download"
+        except Exception:
+            return "download"
+        
     def download(self):
         # handle errors, and retry
         is_continue_downloading = False
@@ -147,13 +159,17 @@ class Task(object):
                         self.onupdating_total_size(self)
                 if not is_continue_downloading:
                     filename = self.task.filename
-                    # 处理content-disposition Header，更新文件名
+                    if not filename:
+                        # 处理content-disposition Header，更新文件名
+                        content_type = None
+                        if headers.has_key('content-disposition'):
+                            filename_from_content_disposition = self._filename_from_content_disposition(headers['content-disposition'])
+                            if filename_from_content_disposition:
+                                filename = filename_from_content_disposition
+                        else:
+                            filename=self._get_filename_by_url(url)
                     content_type = None
-                    if headers.has_key('content-disposition'):
-                        filename_from_content_disposition = self._filename_from_content_disposition(headers['content-disposition'])
-                        if filename_from_content_disposition:
-                            filename = filename_from_content_disposition
-                    elif headers.has_key('content-type'):
+                    if headers.has_key('content-type'):
                         # guess extension by content-type only when there is no content-disposition header
                         content_type = headers['content-type']
                     # 检查文件是否已经存在，如果存在，后面添加序号

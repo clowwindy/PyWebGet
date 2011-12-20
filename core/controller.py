@@ -139,8 +139,6 @@ class Controller(object):
             return
         if re.match(r"[^:]+://[^/]+/?([^?#]*)",url):
             db = self._db()
-            if not filename:
-                filename=self._get_filename_by_url(url)
             db.insert('Task', url=url,
                       cookie=cookie,
                       referer=referer,
@@ -363,15 +361,3 @@ class Controller(object):
         finally:
             self.filename_lock.release()
         self.update_event.set()
-
-    def _get_filename_by_url(self, url):
-        try:
-            import re
-            result = re.match(r"[^:]+://[^/]+/?([^?#]*)",url).groups()[0]
-            result = result.split('/')[-1]
-            if result:
-                return url_decode(result)
-            else:
-                return "download"
-        except Exception:
-            return "download"

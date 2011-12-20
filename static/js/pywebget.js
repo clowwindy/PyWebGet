@@ -311,11 +311,17 @@
             } else {
                 percent = '<progress></progress>';
             }
+            var filename;
+            if(row.filename) {
+                filename = html_encode(row.filename);
+            } else {
+                filename = html_encode(row.url);
+            }
             return {
                 id:row.id,
                 checkbox:"<input type='checkbox' class='taskid_checkbox' taskid='" + row.id + "' />",
                 status:str_by_status(row.status),
-                filename:"<span title='"+html_encode(row.url)+"'>"+html_encode(row.filename)+"</span>" ,
+                filename:"<span title='"+html_encode(row.url)+"'>"+filename+"</span>" ,
                 dir:html_encode(row.dir),
                 total_size:readablize_bytes(row.total_size),
                 percent:percent,

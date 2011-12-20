@@ -189,6 +189,7 @@ milestone：
 		安装脚本    OK
 		debian启动脚本  OK
 		打包成deb  OK
+		日志文件
 
 	bug修正：
 	    中文文件名

@@ -45,7 +45,10 @@ def detect_encoding(input):
     return 'utf-8'
 
 def url_decode(input,encoding=None):
-    result = urllib.unquote(input.encode('ascii', 'ignore'))
+    if input.find('%') >= 0:
+        result = urllib.unquote(input.encode('ascii', 'ignore'))
+    else:
+        result = input
     if not encoding:
         # detect encoding if encoding is not specified
         encoding = detect_encoding(result)
