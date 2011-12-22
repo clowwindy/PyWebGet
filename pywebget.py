@@ -15,6 +15,8 @@ if args.verbose:
     import core.setting
     core.setting.DEBUG = True
 
+core.utils.init_log()
+
 if os.name == 'posix':
     if args.background:
         daemon.start(args.pid_file, args.user)
@@ -32,6 +34,7 @@ def sig_handler(signum, frame):
     controller.stop()
     webui.app.stop()
     log("exited")
+    core.utils.close_log()
     sys.exit(0)
 
 

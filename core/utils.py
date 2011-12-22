@@ -4,10 +4,31 @@ import mimetypes
 import urllib
 import codecs
 
-__author__ = 'clowwindy'
+LOG_FORMAT = '%(asctime)-15s %(levelname)s %(message)s'
 
-def log(s):
-    print "[%s] %s" % (timestamp_repr(time.time()), s)
+import logging, controller
+
+def init_log(username=None):
+    filename = controller.LOG_FILE
+    logging.basicConfig(filename=filename, level=logging.INFO, format=LOG_FORMAT)
+    import os
+    if not os.access(filename, os.W_OK):
+        try:
+            open(filename, 'w').close()
+            if username:
+                import pwd
+                uid = pwd.getpwnam(username)[2]
+                os.chown(filename, uid, -1)
+        except (IOError, OSError):
+            print 'Warning: Could not create log file'
+
+
+def close_log():
+    logging.shutdown()
+
+def log(msg, level=logging.INFO):
+    logging.log(level, msg)
+#    print "[%s] %s" % (timestamp_repr(time.time()), s)
 
 
 def timestamp_repr(t):

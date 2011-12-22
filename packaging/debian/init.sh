@@ -15,6 +15,7 @@ Name=pywebget
 BIN=/usr/bin/pywebget
 CONFIG_FILE=/etc/pywebget/settings.json
 DB_FILE=/var/lib/pywebget/db.sqlite
+LOG_FILE=/var/log/pywebget.log
 PIDFILE=/var/run/pywebget.pid
 USERNAME=debian-pywebget
 OPTIONS="-c $CONFIG_FILE -d $DB_FILE"
@@ -30,17 +31,17 @@ cd $BASE_DIR
 case "$1" in
     start)
         log_daemon_msg "Starting pywebget daemon" "$NAME"
-	$BIN -b -c $CONFIG_FILE -d $DB_FILE -p $PIDFILE -u $USERNAME >/dev/null
+	$BIN -b -c $CONFIG_FILE -d $DB_FILE -p $PIDFILE -l $LOG_FILE -u $USERNAME >/dev/null
         log_end_msg $?
         ;;
     stop)
         log_daemon_msg "Stopping pywebget daemon" "$NAME"
-        $BIN -s -p $PIDFILE -u $USERNAME >/dev/null
+        $BIN -s -p $PIDFILE -l $LOG_FILE -u $USERNAME >/dev/null
         log_end_msg $?
         ;;
     restart)
         log_daemon_msg "Restarting pywebget daemon" "$NAME"
-	$BIN -r -c $CONFIG_FILE -d $DB_FILE -p $PIDFILE -u $USERNAME >/dev/null
+	$BIN -r -c $CONFIG_FILE -d $DB_FILE -p $PIDFILE -l $LOG_FILE -u $USERNAME >/dev/null
         log_end_msg $?
         ;;
     *)

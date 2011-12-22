@@ -7,6 +7,7 @@ import httplib
 import urlparse
 import setting
 from utils import log, url_decode
+import logging
 
 __author__ = 'clowwindy'
 
@@ -229,8 +230,7 @@ class Task(object):
                     return
             except socket.timeout:
                 import traceback
-
-                traceback.print_exc()
+                log(traceback.format_exc(),level=logging.ERROR)
 
                 if self.retry_count > self.retry_limit:
                     if self.onerror:
@@ -238,8 +238,7 @@ class Task(object):
                     return
             except Exception:
                 import traceback
-
-                traceback.print_exc()
+                log(traceback.format_exc(),level=logging.ERROR)
 
                 if self.retry_count > self.retry_limit:
                     if self.onerror:
@@ -251,7 +250,7 @@ class Task(object):
                 if netfile:
                     netfile.close()
             if self.status == STATUS_DOWNLOADING:
-                log("failed, wait %d seconds for retrying: %s" % (self.retry_interval, self.task.url))
+                log("failed, wait %d seconds for retrying: %s" % (self.retry_interval, self.task.url), level=logging.WARNING)
                 self.event.clear()
                 self.event.wait(self.retry_interval)
             else:

@@ -11,6 +11,11 @@ if os.name == 'posix':
 else:
     DB_NAME = 'db.sqlite'
 
+if os.name == 'posix':
+    LOG_FILE = os.path.expanduser('~/.pywebget/log')
+else:
+    LOG_FILE = 'pywebget.log'
+
 DB_TYPE = 'sqlite'
 
 EMPTY_DB = "../share/empty.db"

@@ -7,6 +7,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-V', '--version', action='version')
 parser.add_argument('-c', '--config-file', metavar="FILE", help='specify config file')
 parser.add_argument('-d', '--db-file', metavar="FILE", help='specify database file')
+parser.add_argument('-l', '--log-file', metavar="FILE", help='specify log file')
 
 if os.name == 'posix':
     daemon_group = parser.add_argument_group('Daemon options')
@@ -29,6 +30,9 @@ def parse_args():
     if args.db_file:
         import controller
         controller.DB_NAME = args.db_file
+    if args.log_file:
+        import controller
+        controller.LOG_FILE = args.log_file
 
     if os.name == 'posix':
         if [args.background, args.stop, args.restart].count(True) > 1:
