@@ -6,7 +6,13 @@ import codecs
 
 LOG_FORMAT = '%(asctime)-15s %(levelname)s %(message)s'
 
-import logging, controller
+import sys, logging, controller
+
+class LogWriter(object):
+    log = []
+
+    def write(self, data):
+        logging.warning(data)
 
 def init_log(username=None):
     filename = controller.LOG_FILE
@@ -20,8 +26,8 @@ def init_log(username=None):
                 uid = pwd.getpwnam(username)[2]
                 os.chown(filename, uid, -1)
         except (IOError, OSError):
-            import sys
             print >> sys.stderr, 'Warning: Could not create log file %s' % filename
+    sys.stderr = LogWriter()
 
 
 def close_log():
