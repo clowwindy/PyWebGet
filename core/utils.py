@@ -20,7 +20,8 @@ def init_log(username=None):
                 uid = pwd.getpwnam(username)[2]
                 os.chown(filename, uid, -1)
         except (IOError, OSError):
-            print 'Warning: Could not create log file %s' % filename
+            import sys
+            print >> sys.stderr, 'Warning: Could not create log file %s' % filename
 
 
 def close_log():
