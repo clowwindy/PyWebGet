@@ -5,6 +5,7 @@ import urllib
 import codecs
 
 LOG_FORMAT = '%(asctime)-15s %(levelname)s %(message)s'
+ENCODING_COFIDENCE_LIMIT = 0.8
 
 import sys, logging, controller
 
@@ -68,7 +69,7 @@ def detect_encoding(input):
     detector.reset()
     detector.feed(input)
     detector.close()
-    if detector.result and detector.result['confidence'] > 0.5:
+    if detector.result and detector.result['confidence'] >= ENCODING_COFIDENCE_LIMIT:
         return detector.result['encoding']
     return 'utf-8'
 

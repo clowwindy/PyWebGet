@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 
+import os, sys
+if os.name == 'posix':
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
+
 import threading
-import signal, os, sys
+import signal
 from core.controller import Controller
 import core.utils
 import core.version
