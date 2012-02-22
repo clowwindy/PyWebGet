@@ -1,6 +1,8 @@
 # [PyWebGet](https://github.com/clowwindy/PyWebGet "PyWebGet Homepage")
 A background HTTP download manager with a web interface.
 
+![Screenshot](http://clowwindy.github.com/PyWebGet/pywebget.jpg)
+
 ## Dependency
  Python 2.6 ~ Python 2.7, Unix/Linux or Windows.
 
